@@ -67,47 +67,38 @@
 		<jsp:include page="/WEB-INF/view/Layout/navigation.jsp" flush="false" />
 		<div id="page-wrapper">
 			<br />
-			<c:if test="${POPUP != null}">
-				<c:set var="className1" value="" />
-				<c:set var="className2" value="alert alert-info" />
-				<c:set var="tagId" value="static" />
-				<c:forEach var="popup" items="${POPUP }">
-					<c:if test=${popup.dismiss == "yes" }>
-						<c:set var="className1" value="alert-dismissable" />
+			<c:if test="${Errors != null}">
+				<c:set var="classNameHead" value="alert-dismissable " />
+				<c:set var="classNameTail" value=" autohide " />
+				<c:forEach var="popup" items="${Errors}">
+				<c:set var="classNameDefault" value="${popup.get('Type')}" />
+					<c:if test="${popup.get('Dismiss') == 'yes'}">
+						<c:set var="className" value="${classNameHead} ${classNameDefault}" />
 					</c:if>
-					<c:if test=${popup.type != "alert alert-info" }>
-						<c:set var="className2" value="${popup.type }" />
-					</c:if>
-					<c:if test ${popup.id !="static"}>
-						<c:set var="tagId" value="${popup.id }" />
-					</c:if>
-					<div class="${className1 } ${className2 } " id="${tagId }">
-						<c:if test=${popup.dismiss == "yes" }>
-							<button id="${tagId }" type="button" class="close"
+					<c:set var="className" value="${classNameDefault }" />
+					<div class="${className}" id="${popup.get('ID')}">
+						<c:if test="${popup.get('Dismiss') == 'yes'}">
+							<button id="${popup.get('ID')}" type="button" class="close"
 								data-dismiss="alert" aria-hidden="true">&times;</button>
 						</c:if>
 						<c:choose>
-							<c:when test="${popup.type == " alertalert-info" }">
-								<span class="glyphicon glyphicon-info-sign">&nbsp;</span>
-							</c:when>
-							<c:when test="${popup.type == " alertalert-warning" }">
-								<span class="glyphicon glyphicon-info-sign">&nbsp;</span>
-							</c:when>
-							<c:when test="${popup.type == " alertalert-danger" }">
-								<span class="glyphicon glyphicon-remove-circle">&nbsp;</span>
-							</c:when>
-							<c:when test="${popup.type == " alertalert-success" }">
-								<span class="glyphicon glyphicon-ok-circle">&nbsp;</span>
-							</c:when>
+						<c:when test="${popup.get('Type') == 'alert alert-info'}">
+						<span class="glyphicon glyphicon-info-sign">&nbsp;</span>
+						</c:when>
+						<c:when test="${popup.get('Type') == 'alert alert-warning'}">
+						<span class="glyphicon glyphicon-info-sign">&nbsp;</span>
+						</c:when>
+						<c:when test="${popup.get('Type') == 'alert alert-danger'}">
+						<span class="glyphicon glyphicon-remove-circle">&nbsp;</span>
+						</c:when>
+						<c:when test="${popup.get('Type') == 'alert alert-success'}">
+						<span class="glyphicon glyphicon-ok-circle">&nbsp;</span>
+						</c:when>
 						</c:choose>
-						${popup.content }
+						${popup.get('Content')}
 					</div>
 				</c:forEach>
 			</c:if>
-			{if $CONTENT != "empty" && $CONTENT != ""} {if
-			file_exists($smarty.current_dir|cat:"/$PAGE/$ACTION/$CONTENT")}
-			{include file="$PAGE/$ACTION/$CONTENT"} {else} Missing template for
-			this page {/if} {/if}
 			<c:if test="${Content != null}">
 				<jsp:include page="${Content}" flush="false" />
 			</c:if>

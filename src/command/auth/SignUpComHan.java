@@ -2,6 +2,10 @@ package command.auth;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +30,7 @@ public class SignUpComHan implements ComHanInterFace{
 			Connection conn = null;
 			try {
 				conn = JDBCConnection.getConnection();
-				boolean complete = AccountsDao.getInstance().register(conn, signUpVo);
+				//boolean complete = AccountsDao.getInstance().register(conn, signUpVo);
 				
 			} catch (NamingException e) {
 				// TODO Auto-generated catch block
@@ -37,6 +41,27 @@ public class SignUpComHan implements ComHanInterFace{
 			}finally {
 				CloseUtilities.close(conn);
 			}
+		} else if(request.getMethod().equals("GET")) {
+			List<Map<String, String>> popups = new ArrayList<>();
+			Map<String, String> popup = new HashMap<>();
+			popup.put("Content", "Login Data");
+			popup.put("ID", "lastlogin");
+			popup.put("Type", "alert alert-info");
+			popup.put("Dismiss", "yes");
+			popups.add(popup);
+			popup = new HashMap<>();
+			popup.put("Content", "warning your account is dangerous");
+			popup.put("ID", "static");
+			popup.put("Type", "alert alert-warning");
+			popup.put("Dismiss", "no");
+			popups.add(popup);
+			popup = new HashMap<>();
+			popup.put("Content", "Test danger");
+			popup.put("ID", "static");
+			popup.put("Type", "alert alert-warning");
+			popup.put("Dismiss", "no");
+			popups.add(popup);
+			request.setAttribute("Errors", popups);
 		}
 		return Content;
 	}
@@ -50,15 +75,16 @@ public class SignUpComHan implements ComHanInterFace{
 		signUpVo.setEmail2(excludedTrimAndWhiteSpace(request.getParameter("email2")));
 		signUpVo.setPin(excludedTrimAndWhiteSpace(request.getParameter("pin")));
 		signUpVo.setTac(excludedTrimAndWhiteSpace(request.getParameter("tac")));
-		
+		System.out.println(signUpVo.getTac());
 		return signUpVo;
 	}
 	
 	public String excludedTrimAndWhiteSpace(String parameter) {
-		if(parameter != null && parameter.trim().isEmpty())
+		if(parameter != null && !parameter.trim().isEmpty()) {
+			parameter = parameter.replaceAll("\\p{Z}", "");
+		}else {
 			parameter = null;
-		parameter = parameter.replaceAll("\\p{Z}", "");
-		
+		}
 		return parameter;
 	}
 }
