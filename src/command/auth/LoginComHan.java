@@ -18,7 +18,6 @@ public class LoginComHan implements ComHanInterFace {
 		String Content = request.getMethod().equals("GET") ? "/WEB-INF/view/Content/Login.jsp" 
 				: request.getMethod().equals("POST") ? "DashBoard.do"
 				: null;
-		System.out.println("comhan");
 		// POST 방식으로 넘어왔을 때
 		if (request.getMethod().equals("POST")){
 			String username = request.getParameter("username");
@@ -37,10 +36,8 @@ public class LoginComHan implements ComHanInterFace {
 				try { 
 					conn = JDBCConnection.getConnection();
 					conn.setAutoCommit(false);
-					System.out.println("before getValue");
 					if (!settingsDao.getValue(conn, "maintenance").equals("") 
 							&& !accountsDao.isAdmin(conn, accountsDao.getUserIdByEmail(conn, username))) {
-						System.out.println("after getValue");
 						popup = Popup.getPopup("You are not allowed to login during maintenace.", "alert alert-info", null, null);
 						popups.add(popup);
 					} else { 
@@ -50,12 +47,13 @@ public class LoginComHan implements ComHanInterFace {
 							System.out.println("after checkLogin1");
 							// 로그인 성공 시 dashBoard.do로 보냄
 							conn.commit();
+							System.out.println("Content : " + Content);
 							return Content;
 						} else { 
 							System.out.println("before checkLogin2");
-							popup = Popup.getPopup("Unable to login: 여기라고??" + accountsDao.getError(), "alert alert-danger", null, null);
+							popup = Popup.getPopup("Unable to login: " + accountsDao.getError(), "alert alert-danger", null, null);
 							popups.add(popup);
-							conn.rollback();
+							conn.commit();
 						} 
 					}
 				} catch (NamingException | SQLException e) {
@@ -63,7 +61,7 @@ public class LoginComHan implements ComHanInterFace {
 					e.printStackTrace();
 					try {
 						System.out.println("exception");
-						popup = Popup.getPopup("Unable to login: 여기왔다." + accountsDao.getError(), "alert alert-danger", null, null);
+						popup = Popup.getPopup("Unable to login: " + accountsDao.getError(), "alert alert-danger", null, null);
 						popups.add(popup);
 						conn.rollback();
 					} catch (SQLException e1) {
@@ -78,7 +76,7 @@ public class LoginComHan implements ComHanInterFace {
 			// 로그인 실패 Login.do로 다시 보냄
 			request.setAttribute("Errors", popups);
 			request.setAttribute("active", true);
-			popup = Popup.getPopup("Unable to login: 여기라고??", "alert alert-danger", null, null);
+			popup = Popup.getPopup("Unable to login: ", "alert alert-danger", null, null);
 			popups.add(popup);
 			return "/WEB-INF/view/Content/Login.jsp";
 		}
