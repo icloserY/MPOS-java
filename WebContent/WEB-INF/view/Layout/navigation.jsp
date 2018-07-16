@@ -15,7 +15,7 @@
                     </li>
 					<%-- account가 현재 활성화 page일때 
 					    <li class="${getPage eq "account" ? "active" : "" }"> --%>
-					<li class="${ false ? 'active' : '' }">
+					<li class="${ MyAccounts ? 'active' : '' }">
                         <a href="#"><i class="fa fa-user-md fa-fw"></i> My Account<span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
                           <li><a href="{$smarty.server.SCRIPT_NAME}?page=account&action=edit"><i class="fa fa-edit fa-fw"></i> Edit Account</a></li>
@@ -82,7 +82,7 @@
                     </li>
                     </c:if>
 					<%-- statistics가 현재 활성화 page일때 <li class="${ getPage eq statistics ? 'active' : '' }" > --%>
-					<li class="${ false ? 'active' : '' }" >
+					<li class="${ Statistics ? 'active' : '' }" >
                         <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Statistics<span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
                           <li><a href="/index.php?page=statistics&action=pool"><i class="fa fa-align-left fa-fw"></i> Pool</a></li>
@@ -96,7 +96,7 @@
                         <!-- /.nav-second-level -->
                     </li>
 					<%-- help가 현재 활성화 page일때 <li class="${getPage eq gettingstarted || getPage eq about ? 'active' : '' }" > --%>
-					<li class="${false ? 'active' : '' }" >
+					<li class="${ Help ? 'active' : '' }" >
                         <a href="#"><i class="fa fa-question fa-fw"></i> Help<span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
                           <li><a href="{$smarty.server.SCRIPT_NAME}?page=gettingstarted"><i class="fa fa-question fa-fw"></i> Getting Started</a></li>
@@ -106,7 +106,7 @@
                     </li>
 					<%-- Other가 현재 활성화 page일때
 					   <li class="${ getPage eq register || getPage eq login || getPage eq logout || getPage eq tac || getPage eq contactform ? 'active' : '' }" > --%>
-					<li class="${ false ? 'active' : '' }" >
+					<li class="${ Other ? 'active' : '' }" >
                         <a href="#"><i class="fa fa-tasks fa-fw"></i> Other<span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
                           <c:choose>
@@ -116,8 +116,8 @@
                           	</c:when>
                           	<%-- 비로그인시 --%>
                           	<c:when test="true">	
-	                          <li><a href="{$smarty.server.SCRIPT_NAME}?page=login"><i class="fa fa-sign-in fa-fw"></i> Login</a></li>
-	                          <li><a href="{$smarty.server.SCRIPT_NAME}?page=register"><i class="fa fa-pencil fa-fw"></i> Sign Up</a></li>
+	                          <li><a href="Login.do"><i class="fa fa-sign-in fa-fw"></i> Login</a></li>
+	                          <li><a href="SignUp.do"><i class="fa fa-pencil fa-fw"></i> Sign Up</a></li>
                           	</c:when>
                           </c:choose>
                           <li><a href="/index.php?page=contactform&action="><i class="fa fa-envelope fa-fw"></i> Contact</a></li>
