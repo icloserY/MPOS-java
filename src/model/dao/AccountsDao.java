@@ -12,7 +12,9 @@ import model.*;
 import model.vo.*;
 
 public class AccountsDao extends Base {
-	protected String table = "accounts";
+	public AccountsDao() {
+		this.table = "accounts";
+	}
 	protected AccountsVo accountsVo = new AccountsVo();
 	private static AccountsDao accountsDao = new AccountsDao();
 
@@ -98,12 +100,14 @@ public class AccountsDao extends Base {
 
 	// get is_Admin
 	public boolean isAdmin(Connection conn, int id) throws SQLException {
+		System.out.println("isAdmin");
 		String resultValue = "";
 		boolean returnValue = false;
 		resultValue = getSingle(conn, String.valueOf(id), "is_admin", "id", 0, 0, false);
 		if (!resultValue.equals("")) {
 			returnValue = (Integer.parseInt(resultValue) == 0) ? false : true;
 		}
+		System.out.println("isAdmin after");
 		return returnValue;
 	}
 
@@ -146,6 +150,8 @@ public class AccountsDao extends Base {
 		if (checkUserPassword(conn, name, password)) {
 			// rest of login process
 			int uid = accountsVo.getId();
+			System.out.println(accountsVo.getId());
+			System.out.println(accountsVo.getPassword());
 			int lastLoginTime = getLastLogin(conn, uid);
 			updateLoginTimestamp(conn, uid);
 			String getIpAddress = getUserIp(conn, uid);
@@ -153,6 +159,7 @@ public class AccountsDao extends Base {
 			createSession(name, getIpAddress, lastLoginTime, request);
 			return true;
 		}
+		System.out.println("비밀번호 틀림");
 		setErrorMessage("Invalid username or password");
 		int id = getUserId(conn, username);
 		if (id != 0) {

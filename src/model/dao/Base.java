@@ -55,21 +55,19 @@ public class Base {
 		ResultSet rs = null;
 		String resultValue = ""; 
 		try {
-			pstmt = lower ? conn.prepareStatement("Select ? From ? where LOWER(?) = LOWER(?) LIMIT 1")
-			 : conn.prepareStatement("Select ? From ? where ? = ? LIMIT 1");
+			pstmt = lower ? conn.prepareStatement("Select ? From "+this.table+" where LOWER(?) = LOWER(?) LIMIT 1")
+			 : conn.prepareStatement("Select ? From "+this.table+" where ? = ? LIMIT 1");
+			System.out.println("Select ? From "+this.table+" where ? = ? LIMIT 1");
 			pstmt.setString(1, search);
-			pstmt.setString(2, this.table);
-			pstmt.setString(3, field);
+			pstmt.setString(2, field);
 			if(valueType == 0){
-				pstmt.setInt(4, Integer.parseInt(value));
+				pstmt.setInt(3, Integer.parseInt(value));
 			}else {
-				pstmt.setString(4, value);
+				pstmt.setString(3, value);
 			}
 			rs = pstmt.executeQuery();
 			if(rs.next()) {
 				resultValue = (searchType == 0) ? String.valueOf(rs.getInt(1)) : rs.getString(1);
-			}else {
-				throw new SQLException();
 			}
 		}finally {
 			CloseUtilities.close(rs);

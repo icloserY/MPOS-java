@@ -3,7 +3,9 @@ package model.dao;
 import java.sql.*;
 
 public class Token_typesDao extends Base {
-	protected String table = "token_types";
+	public Token_typesDao() {
+		this.table = "token_types";
+	}
 	private static Token_typesDao token_typesDao = new Token_typesDao();
 
 	public static Token_typesDao getInstance() {

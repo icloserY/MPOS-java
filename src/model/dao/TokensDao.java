@@ -6,7 +6,9 @@ import java.util.*;
 import model.*;
 
 public class TokensDao extends Base {
-	protected String table = "tokens";
+	public TokensDao() {
+		this.table = "tokens";
+	}
 	private static TokensDao tokensDao = new TokensDao();
 	Token_typesDao token_typesDao = Token_typesDao.getInstance();
 	

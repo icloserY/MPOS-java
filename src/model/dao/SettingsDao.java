@@ -3,7 +3,9 @@ package model.dao;
 import java.sql.*;
 
 public class SettingsDao extends Base {
-	protected String table = "settings";
+	public SettingsDao() {
+		this.table = "settings";
+	}
 	private static SettingsDao settingsDao = new SettingsDao();
 	public static SettingsDao getInstance() {
 		return settingsDao;

@@ -59,7 +59,8 @@ public class LoginComHan implements ComHanInterFace {
 						} 
 					}
 				} catch (NamingException | SQLException e) {
-					// 실패시 return login.do  
+					// 실패시 return login.do 
+					e.printStackTrace();
 					try {
 						System.out.println("exception");
 						popup = Popup.getPopup("Unable to login: 여기왔다." + accountsDao.getError(), "alert alert-danger", null, null);
