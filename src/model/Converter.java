@@ -1,6 +1,14 @@
 package model;
 
+import java.util.Random;
+
 public class Converter {
+	public String getRandomByte() {
+		Random randomGenerator = new Random();
+		byte[] randomBytes = new byte[32];
+		randomGenerator.nextBytes(randomBytes);
+		return Converter.bin2hex(randomBytes);
+	}
 	public static byte[] hex2bin(String hex) throws NumberFormatException {
 	    if (hex.length() % 2 > 0) {
 	        throw new NumberFormatException("Hexadecimal input string must have an even length.");
