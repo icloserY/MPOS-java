@@ -55,16 +55,14 @@ public class Base {
 		ResultSet rs = null;
 		String resultValue = ""; 
 		try {
-			pstmt = lower ? conn.prepareStatement("Select ? From "+this.table+" where LOWER(?) = LOWER(?) LIMIT 1")
-			 : conn.prepareStatement("Select ? From "+this.table+" where ? = ? LIMIT 1");
-			System.out.println("Select ? From "+this.table+" where ? = ? LIMIT 1");
-			pstmt.setString(1, search);
-			pstmt.setString(2, field);
+			pstmt = lower ? conn.prepareStatement("Select "+search+" From "+this.table+" where LOWER("+field+") = LOWER(?) LIMIT 1")
+			 : conn.prepareStatement("Select "+search+" From "+this.table+" where "+field+" = ? LIMIT 1");
 			if(valueType == 0){
-				pstmt.setInt(3, Integer.parseInt(value));
+				pstmt.setInt(1, Integer.parseInt(value));
 			}else {
-				pstmt.setString(3, value);
+				pstmt.setString(1, value);
 			}
+			System.out.println("pstmt:"+pstmt.toString());
 			rs = pstmt.executeQuery();
 			if(rs.next()) {
 				resultValue = (searchType == 0) ? String.valueOf(rs.getInt(1)) : rs.getString(1);
@@ -73,6 +71,7 @@ public class Base {
 			CloseUtilities.close(rs);
 			CloseUtilities.close(pstmt);
 		}
+		System.out.println("resultValue : " + resultValue);
 		return resultValue;
 	}
 	
@@ -94,16 +93,14 @@ public class Base {
 	    PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try{
-			pstmt = conn.prepareStatement("UPDATE ? set ? = ? where id = ? LIMIT 1");
-			pstmt.setString(1, table);
-			pstmt.setString(2, name);
+			pstmt = conn.prepareStatement("UPDATE "+this.table+" set "+name+" = ? where id = ? LIMIT 1");
 			if(valueType == 0){
-				pstmt.setInt(3, Integer.parseInt(value));
+				pstmt.setInt(1, Integer.parseInt(value));
 			}else{
-				pstmt.setString(3, value);
+				pstmt.setString(1, value);
 			}
-			pstmt.setInt(4, id);
-			
+			pstmt.setInt(2, id);
+			System.out.println(pstmt.toString());
 			int insertCount = pstmt.executeUpdate();
 			if(insertCount == 0) {
 				throw new SQLException();

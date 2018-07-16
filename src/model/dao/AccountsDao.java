@@ -2,7 +2,6 @@ package model.dao;
 
 import java.security.*;
 import java.sql.*;
-import java.text.*;
 import java.util.regex.*;
 
 import javax.servlet.http.*;
@@ -25,7 +24,7 @@ public class AccountsDao extends Base {
 	private int getUserId(Connection conn, String username) throws SQLException {
 		String resultValue = "";
 		int returnValue = 0;
-		resultValue = getSingle(conn, username, "id", "username", 1, 0, false);
+		resultValue = getSingle(conn, username, "id", "email", 1, 0, false);
 		if (!resultValue.equals("")) {
 			returnValue = Integer.parseInt(resultValue);
 		}
@@ -82,15 +81,13 @@ public class AccountsDao extends Base {
 
 	/* last_login 변경 */
 	private void updateLoginTimestamp(Connection conn, int id) throws SQLException {
-		long time = System.currentTimeMillis();
-		SimpleDateFormat dayTime = new SimpleDateFormat("yyyymmddhhmmss");
-		String nowTime = dayTime.format(new Date(time));
-		updateSingle(conn, id, "last_login", nowTime, 0, this.table);
+		long time = System.currentTimeMillis() / 1000;
+		updateSingle(conn, id, "last_login", String.valueOf(time), 0, this.table);
 	}
 
 	/* failed_logins + 1 */
 	private void incUserFailed(Connection conn, int id) throws SQLException {
-		updateSingle(conn, id, "failed_logins", String.valueOf(getUserFailed(conn, id)), 0, this.table);
+		updateSingle(conn, id, "failed_logins", String.valueOf(getUserFailed(conn, id)+1), 0, this.table);
 	}
 
 	/* is_locked 변경 */
@@ -127,7 +124,7 @@ public class AccountsDao extends Base {
 			HttpServletRequest request) throws SQLException {
 		String name = getUserNameByEmail(conn, username);
 		// 공백 확인
-		if (username.trim().length() > 0 || password.trim().length() > 0) {
+		if (username.trim().length() == 0 || password.trim().length() == 0) {
 			setErrorMessage("Invalid username or password.");
 			return false;
 		}
@@ -156,6 +153,8 @@ public class AccountsDao extends Base {
 			updateLoginTimestamp(conn, uid);
 			String getIpAddress = getUserIp(conn, uid);
 			setUserIp(conn, uid, ip);
+			System.out.println("lastLoginTime : " + lastLoginTime);
+			System.out.println("getIpAddress : " + getIpAddress);
 			createSession(name, getIpAddress, lastLoginTime, request);
 			return true;
 		}
@@ -216,9 +215,10 @@ public class AccountsDao extends Base {
 			CloseUtilities.close(pstmt);
 		}
 
-		aPassword = accountsVo.getPassword().split("$");
+		aPassword = accountsVo.getPassword().split("\\$");
+		
 		password_Hash = aPassword.length == 1 ? getHash(password, 0, null)
-				: getHash(password, Integer.parseInt(aPassword[0]), aPassword[1]);
+				: getHash(password, Integer.parseInt(aPassword[1]), aPassword[2]);
 
 		return password_Hash.equals(accountsVo.getPassword())
 				&& name.toLowerCase().equals(accountsVo.getUsername().toLowerCase());
@@ -241,10 +241,10 @@ public class AccountsDao extends Base {
 
 		switch (version) {
 		case 0:
-			returnValue = hash("sha256", password);
+			returnValue = hash("SHA-256", password);
 			break;
 		case 1:
-			returnValue = "$" + version + "$" + pepper + "$" + hash("sha256", password + pepper);
+			returnValue = "$" + version + "$" + pepper + "$" + hash("SHA-256", password + pepper);
 			break;
 		}
 		return returnValue;
@@ -271,7 +271,7 @@ public class AccountsDao extends Base {
 	private void createSession(String name, String lastIP, int lastLoginTime, HttpServletRequest request) {
 		request.getSession().invalidate();
 		HttpSession session = request.getSession();
-		if (!lastIP.equals("") && lastLoginTime != 0) {
+		if (lastIP != null && lastLoginTime != 0) {
 			String[] array = { lastIP, String.valueOf(lastLoginTime) };
 			session.setAttribute("last_ip_pop", array);
 		}

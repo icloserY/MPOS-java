@@ -52,7 +52,6 @@ public class DispatcherServlet extends HttpServlet {
 		if(handler == null) {
 			handler = new NullComHan();
 		}
-		System.out.println("servlet");
 		String Content = null;
 		Content = handler.process(request, response);
 		if(Content != null && Content.endsWith(".do")){
@@ -81,6 +80,8 @@ public class DispatcherServlet extends HttpServlet {
 			activeSide = "Help";
 		}else if(command.equals("/Logout.do") || command.equals("/Contact.do") || command.equals("/Tac.do") || command.equals("/Login.do") || command.equals("/SignUp.do")){
 			activeSide = "Other";
+		}else{
+			activeSide = "";
 		}
 		
 		return activeSide;
