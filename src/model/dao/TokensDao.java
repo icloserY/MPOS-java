@@ -32,11 +32,10 @@ public class TokensDao extends Base {
 		
 		String strToken = Converter.bin2hex(randomBytes);
 		
-		pstmt = conn.prepareStatement("INSERT INTO ? (token, type, account_id) VALUES (?, ?, ?)");
-		pstmt.setString(1, this.table);
-		pstmt.setString(2, strToken);
-		pstmt.setInt(3, tokenId);
-		pstmt.setInt(4, account_id);
+		pstmt = conn.prepareStatement("INSERT INTO "+this.table+" (token, type, account_id) VALUES (?, ?, ?)");
+		pstmt.setString(1, strToken);
+		pstmt.setInt(2, tokenId);
+		pstmt.setInt(3, account_id);
 		
 		int insertCount = pstmt.executeUpdate();
 		if(insertCount == 0) {

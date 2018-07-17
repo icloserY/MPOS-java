@@ -97,17 +97,15 @@ public class AccountsDao extends Base {
 
 	// get is_Admin
 	public boolean isAdmin(Connection conn, int id) throws SQLException {
-		System.out.println("isAdmin");
 		String resultValue = "";
 		boolean returnValue = false;
 		resultValue = getSingle(conn, String.valueOf(id), "is_admin", "id", 0, 0, false);
 		if (!resultValue.equals("")) {
 			returnValue = (Integer.parseInt(resultValue) == 0) ? false : true;
 		}
-		System.out.println("isAdmin after");
 		return returnValue;
 	}
-
+ 
 	// get is_locked
 	public boolean isLocked(Connection conn, String name) throws SQLException {
 		String resultValue = "";
@@ -147,18 +145,13 @@ public class AccountsDao extends Base {
 		if (checkUserPassword(conn, name, password)) {
 			// rest of login process
 			int uid = accountsVo.getId();
-			System.out.println(accountsVo.getId());
-			System.out.println(accountsVo.getPassword());
 			int lastLoginTime = getLastLogin(conn, uid);
 			updateLoginTimestamp(conn, uid);
 			String getIpAddress = getUserIp(conn, uid);
 			setUserIp(conn, uid, ip);
-			System.out.println("lastLoginTime : " + lastLoginTime);
-			System.out.println("getIpAddress : " + getIpAddress);
 			createSession(name, getIpAddress, lastLoginTime, request);
 			return true;
 		}
-		System.out.println("비밀번호 틀림");
 		setErrorMessage("Invalid username or password");
 		int id = getUserId(conn, username);
 		if (id != 0) {
@@ -171,13 +164,15 @@ public class AccountsDao extends Base {
 				String token = tokensDao.createToken(conn, "account_unlock", id);
 				if (!token.equals("")) {
 					// 메일 발송
-					request.setAttribute("token", token);
 					String url = request.getRequestURL().substring(0, (request.getRequestURL().length() - request.getServletPath().length()));
-					request.setAttribute("url", url);
+					
 					MailVo mailVo = new MailVo();
 					mailVo.setEmail(username);
 					mailVo.setSubject("Account auto-locked");
 					mailVo.setContent("notifications/locked");
+					mailVo.setUrl(url);
+					mailVo.setToken(token);
+					
 					boolean sendCheck = Mail.sendMail(mailVo);
 					if(!sendCheck){
 						setErrorMessage("Send Mail Failed");
