@@ -11,6 +11,10 @@
 			<param-name>configFile</param-name>
 			<param-value>/WEB-INF/properties/PathInfo.properties</param-value>
 		</init-param>
+		<init-param>
+			<param-name>GlobalSettings</param-name>
+			<param-value>/WEB-INF/properties/GlobalSettings.properties</param-value>
+		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	

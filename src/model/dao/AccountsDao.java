@@ -2,6 +2,7 @@ package model.dao;
 
 import java.security.*;
 import java.sql.*;
+import java.util.HashMap;
 import java.util.regex.*;
 
 import javax.servlet.http.*;
@@ -320,6 +321,7 @@ public class AccountsDao extends Base {
 		}
 		PreparedStatement pstmt = null;
 		try {
+			conn.setAutoCommit(false);
 			if (getFirstID() > 0) {
 				int is_locked = 1;
 				/*
@@ -353,46 +355,45 @@ public class AccountsDao extends Base {
 			pstmt.setString(6, apikey_hash);
 			int count = pstmt.executeUpdate();
 			if(count == 0) {
-				throw new SQLException();
+				//에러메시지 추가 $this->setErrorMessage('Failed to create confirmation token');
+				throw new SQLException("not insert");
 			} else {
-				//accounts_confirm_email_disabled == true
+				//accounts_confirm_email_disabled == true 일경우 토큰, 이메일 발송 하지 않음
 				
-				//accounts_confirm_email_disabled == false 일경우 토큰, 이메일 발송 하지 않음
+				//accounts_confirm_email_disabled == false 
+				TokensDao tokensDao = TokensDao.getInstance();
+				String token = null;
+				int id = 0;
+				if((id = getUserId(conn, signUpVo.getEmail1())) != 0) {
+					token = tokensDao.createToken(conn, "confirm_email", id);
+				} else {
+					throw new SQLException("do not find id by email");
+				}
+				if (!token.equals("")) {
+					// 메일 발송
+					String url = request.getRequestURL().substring(0, (request.getRequestURL().length() - request.getServletPath().length()));
+					
+					MailVo mailVo = new MailVo();
+					mailVo.setEmail(signUpVo.getEmail1());
+					mailVo.setSubject("Confirm Your Registration");
+					mailVo.setContent(/*GlobalSettings.get()*/"");
+					mailVo.setUrl(url);
+					mailVo.setToken(token);
+					
+					boolean sendCheck = Mail.sendMail(mailVo);
+					if (!sendCheck) {
+						setErrorMessage("register Failed please try later");
+						throw new SQLException("register Failed please try later");
+					}
+				} else {
+					throw new SQLException("Unable to create confirm_email token");
+				}
 				
 			}
-			/*
-			if ($this->checkStmt($stmt) && $stmt->bind_param('sssissi', $username_clean, $password_hash, $email1, $signup_time, $pin_hash, $apikey_hash, $is_locked) && $stmt->execute()) {
-			      $new_account_id = $this->mysqli->lastused->insert_id;
-			      if (!is_null($coinaddress)) $this->coin_address->add($new_account_id, $coinaddress);
-			      if (! $this->setting->getValue('accounts_confirm_email_disabled') && $is_admin != 1) {
-			        if ($token = $this->token->createToken('confirm_email', $stmt->insert_id)) {
-			          $aData['username'] = $username_clean;
-			          $aData['token'] = $token;
-			          $aData['email'] = $email1;
-			          $aData['subject'] = 'E-Mail verification';
-			          if (!$this->mail->sendMail('register/confirm_email', $aData)) {
-			            $this->setErrorMessage('Unable to request email confirmation: ' . $this->mail->getError());
-			            return false;
-			          }
-			          return true;
-			        } else {
-			          $this->setErrorMessage('Failed to create confirmation token');
-			          $this->debug->append('Unable to create confirm_email token: ' . $this->token->getError());
-			          return false;
-			        }
-			      } else {
-			        return true;
-			      }
-			    } else {
-			      $this->setErrorMessage( 'Unable to register' );
-			      $this->debug->append('Failed to insert user into DB: ' . $this->mysqli->lastused->error);
-			      echo $this->mysqli->lastused->error;
-			      if ($stmt->sqlstate == '23000') $this->setErrorMessage( 'Username or email already registered' );
-			      return false;
-			    }
-			    */
+			conn.commit();
 		} catch (SQLException e) {
-			//에러메시지 추가 $this->setErrorMessage('Failed to create confirmation token');
+			//에러메시지 추가 $this->setErrorMessage('Failed to create confirmation');
+			conn.rollback();
 			e.printStackTrace();
 			return false;
 		} finally {
