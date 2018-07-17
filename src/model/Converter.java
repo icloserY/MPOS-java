@@ -3,7 +3,7 @@ package model;
 import java.util.Random;
 
 public class Converter {
-	public String getRandomByte() {
+	public static String getRandomByte() {
 		Random randomGenerator = new Random();
 		byte[] randomBytes = new byte[32];
 		randomGenerator.nextBytes(randomBytes);
@@ -19,7 +19,6 @@ public class Converter {
 	    }
 	    return r;
 	}
-
 	private static int digit(char ch) {
 	    //TODO Optimize this
 	    int r = Character.digit(ch, 16);
