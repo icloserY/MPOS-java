@@ -23,11 +23,11 @@
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                     	<%-- 로그인에 따라 Text 변경 <i class="fa fa-user fa-fw"></i> ${ loginTest ? username : Guest } <i class="fa fa-caret-down"></i> --%>
-                    	<i class="fa fa-user fa-fw"></i> ${ false ? username : 'Guest' } <i class="fa fa-caret-down"></i>
+                    	<i class="fa fa-user fa-fw"></i> ${ AUTHENTICATED == 1 ? USERDATA.username : 'Guest' } <i class="fa fa-caret-down"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-user">
                     	<c:choose>
-                    		<c:when test="로그인시">
+                    		<c:when test="${AUTHENTICATED == 1 }">
 		                        <li><a href="{$smarty.server.SCRIPT_NAME}?page=dashboard"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
 		                        <li><a href="{$smarty.server.SCRIPT_NAME}?page=account&action=edit"><i class="fa fa-gear fa-fw"></i> Settings</a>
 		                        <li><a href="{$smarty.server.SCRIPT_NAME}?page=account&action=workers"><i class="fa fa-desktop fa-fw"></i> Workers</a>
@@ -36,9 +36,9 @@
 		                        <li><a href="{$smarty.server.SCRIPT_NAME}?page=logout"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
 		                        </li>
                         	</c:when>
-                        	<c:when test="true">
-		                        <li><a href="{$smarty.server.SCRIPT_NAME}?page=login"><i class="fa fa-sign-in fa-fw"></i> Login</a>
-		                        <li><a href="/MPOS-java/SignUp.do"><i class="fa fa-pencil fa-fw"></i> Sign Up</a>
+                        	<c:when test="${AUTHENTICATED != 1 }">
+		                        <li><a href="Login.do"><i class="fa fa-sign-in fa-fw"></i> Login</a>
+		                        <li><a href="SignUp.do"><i class="fa fa-pencil fa-fw"></i> Sign Up</a>
 		                        </li>
                         	</c:when>
                         </c:choose>

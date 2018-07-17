@@ -1,6 +1,6 @@
 package filter;
 
-import java.io.IOException;
+import java.io.*;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -10,7 +10,6 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 public class LoginCheckFilter implements Filter {
@@ -34,6 +33,7 @@ public class LoginCheckFilter implements Filter {
 		} else {
 			RequestDispatcher dispatcher = httpRequest.getRequestDispatcher("index.jsp");
 			dispatcher.forward(request, response);
+			
 		}
 	}
 
