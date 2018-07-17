@@ -42,15 +42,11 @@ public class LoginComHan implements ComHanInterFace {
 						popups.add(popup);
 					} else { 
 						// check if login is correct
-						System.out.println("before checkLogin");
 						if (accountsDao.checkLogin(conn, username, password, request.getRemoteAddr(), request)) {
-							System.out.println("after checkLogin1");
 							// 로그인 성공 시 dashBoard.do로 보냄
 							conn.commit();
-							System.out.println("Content : " + Content);
 							return Content;
 						} else { 
-							System.out.println("before checkLogin2");
 							popup = Popup.getPopup("Unable to login: " + accountsDao.getError(), "alert alert-danger", null, null);
 							popups.add(popup);
 							conn.commit();
@@ -60,7 +56,6 @@ public class LoginComHan implements ComHanInterFace {
 					// 실패시 return login.do 
 					e.printStackTrace();
 					try {
-						System.out.println("exception");
 						popup = Popup.getPopup("Unable to login: " + accountsDao.getError(), "alert alert-danger", null, null);
 						popups.add(popup);
 						conn.rollback();

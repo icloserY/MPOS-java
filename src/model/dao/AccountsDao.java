@@ -6,8 +6,6 @@ import java.util.regex.*;
 
 import javax.servlet.http.*;
 
-import com.mysql.jdbc.log.Log;
-
 import jdbc.*;
 import model.*;
 import model.vo.*;
@@ -172,7 +170,7 @@ public class AccountsDao extends Base {
 					MailVo mailVo = new MailVo();
 					mailVo.setEmail(username);
 					mailVo.setSubject("Account auto-locked");
-					mailVo.setContent("notifications/locked");
+					mailVo.setContent("mail.ftl.locked");
 					mailVo.setUrl(url);
 					mailVo.setToken(token);
 					
