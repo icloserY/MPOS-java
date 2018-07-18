@@ -85,9 +85,10 @@ public class Base {
 	 * table : 데이터를 변경할 테이블 이름  ""일경우 this.table 이용
 	 * 
 	 * */
-	protected void updateSingle(Connection conn, int id, String name, String value, 
+	protected int updateSingle(Connection conn, int id, String name, String value, 
 			int valueType, String table) throws SQLException {
 	    table = (table.equals("")) ? this.table : table;
+	    int updateRow = 0;
 	    PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try{
@@ -98,14 +99,15 @@ public class Base {
 				pstmt.setString(1, value);
 			}
 			pstmt.setInt(2, id);
-			int insertCount = pstmt.executeUpdate();
-			if(insertCount == 0) {
-				throw new SQLException();
-			}
+			updateRow = pstmt.executeUpdate();
+			
+			
 		}finally{
 			CloseUtilities.close(rs);
 			CloseUtilities.close(pstmt); 
 		}
+		
+		return updateRow;
 	}
 	
 }

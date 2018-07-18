@@ -111,11 +111,11 @@
                         <ul class="nav nav-second-level">
                           <c:choose>
                           	<%-- 로그인시 --%>
-                          	<c:when test="로그인">
+                          	<c:when test="${AUTHENTICATED == 1 }">
                           		<li><a href="{$smarty.server.SCRIPT_NAME}?page=logout"><i class="fa fa-sign-out fa-fw"></i> Logout</a></li>
                           	</c:when>
                           	<%-- 비로그인시 --%>
-                          	<c:when test="true">	
+                          	<c:when test="${AUTHENTICATED != 1 }">
 	                          <li><a href="Login.do"><i class="fa fa-sign-in fa-fw"></i> Login</a></li>
 	                          <li><a href="SignUp.do"><i class="fa fa-pencil fa-fw"></i> Sign Up</a></li>
                           	</c:when>

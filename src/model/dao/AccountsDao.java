@@ -98,10 +98,20 @@ public class AccountsDao extends Base {
 	}
 
 	/* is_locked 변경 */
-	private void setLocked(Connection conn, int id, int value) throws SQLException {
-		updateSingle(conn, id, "is_locked", String.valueOf(value), 0, this.table);
+	public int setLocked(Connection conn, int id, int value) throws SQLException {
+		return updateSingle(conn, id, "is_locked", String.valueOf(value), 0, this.table);
 	}
-
+ 
+	/* filed_logins 변경 */
+	public int setUserFailed(Connection conn, int id, int value) throws SQLException {
+		return updateSingle(conn, id, "failed_logins", String.valueOf(value), 0, this.table);
+	}
+	
+	/* failed_pins 변경 */
+	public int setUserPinFailed(Connection conn, int id, int value) throws SQLException {
+		return updateSingle(conn, id, "failed_pins", String.valueOf(value), 0, this.table);
+	}
+	
 	// get is_Admin
 	public boolean isAdmin(Connection conn, int id) throws SQLException {
 		String resultValue = "";
@@ -501,4 +511,8 @@ public class AccountsDao extends Base {
 		
 	    return false;
 	}
+
+	
+
+
 }
