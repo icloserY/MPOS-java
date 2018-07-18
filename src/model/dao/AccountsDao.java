@@ -573,4 +573,11 @@ public class AccountsDao extends Base {
 		
 	    return false;
 	}
+
+	// 로그아웃, 세션 죽이기
+	public void logoutUser(HttpServletRequest request) {
+		
+		request.getSession().invalidate();
+		 
+	}
 }

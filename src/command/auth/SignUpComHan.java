@@ -66,7 +66,6 @@ public class SignUpComHan implements ComHanInterFace{
 		signUpVo.setEmail2(excludedTrimAndWhiteSpace(request.getParameter("email2")));
 		signUpVo.setPin(excludedTrimAndWhiteSpace(request.getParameter("pin")));
 		signUpVo.setTac(excludedTrimAndWhiteSpace(request.getParameter("tac")));
-		System.out.println(signUpVo.getTac());
 		return signUpVo;
 	}
 	
