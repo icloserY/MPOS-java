@@ -24,6 +24,12 @@ public class AccountsDao extends Base {
 		return accountsDao;
 	}
 
+	private String getUserEmail(Connection conn, String username) throws SQLException {
+		String resultValue = "";
+		resultValue = getSingle(conn, username, "email", "username", 1, 1, true);
+		return resultValue;
+	}
+	
 	private int getUserId(Connection conn, String username) throws SQLException {
 		String resultValue = "";
 		int returnValue = 0;
@@ -94,10 +100,20 @@ public class AccountsDao extends Base {
 	}
 
 	/* is_locked 변경 */
-	private void setLocked(Connection conn, int id, int value) throws SQLException {
-		updateSingle(conn, id, "is_locked", String.valueOf(value), 0, this.table);
+	public int setLocked(Connection conn, int id, int value) throws SQLException {
+		return updateSingle(conn, id, "is_locked", String.valueOf(value), 0, this.table);
 	}
-
+ 
+	/* filed_logins 변경 */
+	public int setUserFailed(Connection conn, int id, int value) throws SQLException {
+		return updateSingle(conn, id, "failed_logins", String.valueOf(value), 0, this.table);
+	}
+	
+	/* failed_pins 변경 */
+	public int setUserPinFailed(Connection conn, int id, int value) throws SQLException {
+		return updateSingle(conn, id, "failed_pins", String.valueOf(value), 0, this.table);
+	}
+	
 	// get is_Admin
 	public boolean isAdmin(Connection conn, int id) throws SQLException {
 		String resultValue = "";
@@ -162,17 +178,17 @@ public class AccountsDao extends Base {
 			// 3번이상 로그인 실패시 해당 계정 is_locked 변경
 			if (getUserFailed(conn, id) > 3) {
 				setLocked(conn, id, 1);
-
 				TokensDao tokensDao = TokensDao.getInstance();
 				String token = tokensDao.createToken(conn, "account_unlock", id);
 				if (!token.equals("")) {
+					// 메일 발송
 					MailVo mailVo = new MailVo();
 					mailVo.setEmail(username);
 					mailVo.setSubject("Account auto-locked");
 					mailVo.setContent(GlobalSettings.get("mail.ftl.locked"));
 					mailVo.setUrl(GlobalSettings.get("contextpath"));
 					mailVo.setToken(token);
-
+					
 					boolean sendCheck = Mail.sendMail(mailVo);
 					if (!sendCheck) {
 						setErrorMessage("Send Mail Failed");
@@ -414,7 +430,6 @@ public class AccountsDao extends Base {
 					}
 				}
 			}
-			conn.commit();
 		} catch (SQLException e) {
 			try {
 				conn.rollback();
@@ -469,5 +484,94 @@ public class AccountsDao extends Base {
 			CloseUtilities.close(rs);
 		}
 		return id;
+	}
+	 
+	// 비밀번호 초기화 메일 전송
+	public boolean initResetPassword(Connection conn, String username) throws SQLException {
+		String name = getUserNameByEmail(conn, username);
+		if (username.trim().equals("")){
+			setErrorMessage("Username must not be empty");
+			return false;
+		}
+		if(checkEmail(username)){
+			if(name.equals("")){
+				setErrorMessage("Invalid username or password.");
+				return false;
+			}else{
+				username = name;
+			}
+		}
+		
+		String email = getUserEmail(conn, username); 
+		if(email.equals("")){
+			setErrorMessage("Please check your mail account to finish your password reset");
+			return false;
+		}
+		
+		TokensDao tokensDao = TokensDao.getInstance();
+		String token = tokensDao.createToken(conn, "password_reset", getUserId(conn, email));
+		if(token.equals("")){
+			setErrorMessage("Unable to setup token for password reset");
+			return false;
+		}
+		
+		MailVo mailVo = new MailVo();
+		mailVo.setUrl(GlobalSettings.get("contextpath"));
+		mailVo.setEmail(email);
+		mailVo.setToken(token);
+		mailVo.setSubject("Password Reset Request");
+		mailVo.setContent(GlobalSettings.get("mail.ftl.reset"));
+		mailVo.setUsername(name);
+		boolean sendCheck = Mail.sendMail(mailVo);
+		if (!sendCheck) {
+			setErrorMessage("Unable to send mail to your address");
+			return false;
+		}
+		return true;
+	}
+
+	
+	// Password Reset 
+	public boolean resetPassword(Connection conn, String token, String newPassword, String newPassword2) throws SQLException {
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		TokensDao tokensDao = TokensDao.getInstance();
+		TokensVo tokensVo = tokensDao.getToken(conn, token, "password_reset");
+		if(tokensVo != null){
+			if(!newPassword.equals(newPassword2)){
+				setErrorMessage("New passwords do not match");
+				return false;
+			}
+			if(newPassword.length() < 8){
+				setErrorMessage("New password is too short, please use more than 8 chars");
+				return false;
+			}
+			String new_hash = getHash(newPassword, 1, Converter.getRandomByte());
+			try{
+				pstmt = conn.prepareStatement("UPDATE "+this.table+" set pass = ? where id = ? LIMIT 1");
+				pstmt.setString(1, new_hash);
+				pstmt.setInt(2, tokensVo.getAccounts_id());
+				
+				int updateRow = pstmt.executeUpdate();
+				if(updateRow == 1){
+					int deleteRow = tokensDao.deleteToken(conn, tokensVo.getToken());
+					if(deleteRow == 1){
+						return true;
+					}else{
+						setErrorMessage("Unable to invalidate used token");
+					}
+				}else{
+					setErrorMessage("Unable to set new password or you chose the same password. Please use a different one.");
+				}
+			}finally{
+				CloseUtilities.close(rs);
+				CloseUtilities.close(pstmt);
+			}
+		}else{
+			setErrorMessage("Invalid token: " + tokensDao.getError());
+		}
+		
+	    return false;
 	}
 }

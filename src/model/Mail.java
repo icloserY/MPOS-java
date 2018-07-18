@@ -13,13 +13,7 @@ public class Mail {
 
 	
 	public static boolean sendMail(MailVo mailVo){
-		/*String user = "jptj1217";
-		String password = "tj08080416";
 		
-		Properties props = new Properties();
-		props.put("mail.smtp.host", "smtp.daum.net");
-		props.put("mail.smtp.port", 465);
-		props.put("mail.smtp.auth", "true");*/
 		String user = GlobalSettings.get("mail.user");
 		String password = GlobalSettings.get("mail.password");
 		
@@ -50,7 +44,6 @@ public class Mail {
 			Writer writer = new StringWriter();
 			template.process(mailVo, writer);
 			message.setContent(writer.toString(), "text/html; charset=utf-8");
-			
 			Transport.send(message);
 			
 			return true;

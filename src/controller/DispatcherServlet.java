@@ -1,15 +1,13 @@
 package controller;
 
 import java.io.*;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.*;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
 
 import command.handler.*;
-import model.GlobalSettings;
+import model.*;
 
 public class DispatcherServlet extends HttpServlet {
 	private Map<String, ComHanInterFace> commandHandlerMap = new HashMap<>();

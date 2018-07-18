@@ -15,12 +15,12 @@ public class ChangePasswordComHan implements ComHanInterFace {
 
 	@Override
 	public String process(HttpServletRequest request, HttpServletResponse response) {
+		String token = request.getParameter("token");
 		String Content = "/WEB-INF/view/Content/ChangePassword.jsp";
-		
+		request.setAttribute("token", token);
 		// POST 방식으로 넘어왔을 때
 		if (request.getMethod().equals("POST")) {
 			String doParam = request.getParameter("do");
-			String token = request.getParameter("token");
 			String newPassword = request.getParameter("newPassword");
 			String newPassword2 = request.getParameter("newPassword2");
 			
@@ -33,8 +33,8 @@ public class ChangePasswordComHan implements ComHanInterFace {
 			AccountsDao accountsDao = AccountsDao.getInstance();
 			Connection conn = null;
 			if(doParam != null && doParam.equals("resetPassword")){
-				try{
-					conn = JDBCConnection.getConnection();
+				try{ 
+					conn = JDBCConnection.getConnection();  
 					conn.setAutoCommit(false);
 					if( accountsDao.resetPassword(conn, token, newPassword, newPassword2)){
 						popup = Popup.getPopup("Password reset complete! Please login.", "alert alert-success", null, null);
@@ -53,13 +53,12 @@ public class ChangePasswordComHan implements ComHanInterFace {
 						e1.printStackTrace();
 					}
 				} finally{
+					request.setAttribute("Errors", popups); 
 					CloseUtilities.close(conn);
 				}
 			}
 			
 		}
-		
-		
 		return Content;
 	}
 

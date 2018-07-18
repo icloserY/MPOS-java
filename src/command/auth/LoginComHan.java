@@ -70,7 +70,6 @@ public class LoginComHan implements ComHanInterFace {
 			
 			// 로그인 실패 Login.do로 다시 보냄
 			request.setAttribute("Errors", popups);
-			request.setAttribute("active", true);
 			return "/WEB-INF/view/Content/Login.jsp";
 		}
 		

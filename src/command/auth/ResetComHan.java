@@ -31,28 +31,20 @@ public class ResetComHan implements ComHanInterFace {
 			Connection conn = null;
 			try{
 				conn = JDBCConnection.getConnection();
-				conn.setAutoCommit(false);
 				if(accountsDao.initResetPassword(conn, username)){
 					popup = Popup.getPopup("Please check your mail account to finish your password reset", "alert alert-success", null, null);
 					popups.add(popup);
-					conn.commit();
 				}else {
 					popup = Popup.getPopup(accountsDao.getError(), "alert alert-danger", null, null);
 					popups.add(popup);
-					conn.rollback();
 				}
 			} catch(NamingException | SQLException e){
 				e.printStackTrace();
-				try {
-					conn.rollback();
-				} catch (SQLException e1) {
-					e1.printStackTrace();
-				}
 			} finally{
+				request.setAttribute("Errors", popups); 
 				CloseUtilities.close(conn);
 			}
 		}
-
 		return Content;
 	}
 
