@@ -25,7 +25,7 @@
       </center>
       <div class="panel-footer">
         <input type="submit" class="btn btn-success btn-sm" value="Login" >
-        <a href="ChangePassword.do"><font size="1">Forgot your password?</font></a>
+        <a href="Reset.do"><font size="1">Forgot your password?</font></a>
       </div>
     </div>
   </form>

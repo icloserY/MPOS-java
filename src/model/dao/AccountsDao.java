@@ -2,7 +2,6 @@ package model.dao;
 
 import java.security.*;
 import java.sql.*;
-import java.util.HashMap;
 import java.util.regex.*;
 
 import javax.servlet.http.*;
@@ -23,6 +22,12 @@ public class AccountsDao extends Base {
 		return accountsDao;
 	}
 
+	private String getUserEmail(Connection conn, String username) throws SQLException {
+		String resultValue = "";
+		resultValue = getSingle(conn, username, "email", "username", 1, 1, true);
+		return resultValue;
+	}
+	
 	private int getUserId(Connection conn, String username) throws SQLException {
 		String resultValue = "";
 		int returnValue = 0;
@@ -161,20 +166,16 @@ public class AccountsDao extends Base {
 			// 3번이상 로그인 실패시 해당 계정 is_locked 변경
 			if (getUserFailed(conn, id) > 3) {
 				setLocked(conn, id, 1);
-
 				TokensDao tokensDao = TokensDao.getInstance();
 				String token = tokensDao.createToken(conn, "account_unlock", id);
 				if (!token.equals("")) {
 					// 메일 발송
-					String url = request.getRequestURL().substring(0, (request.getRequestURL().length() - request.getServletPath().length()));
-					
 					MailVo mailVo = new MailVo();
 					mailVo.setEmail(username);
 					mailVo.setSubject("Account auto-locked");
-					mailVo.setContent("mail.ftl.locked");
-					mailVo.setUrl(url);
+					mailVo.setContent(GlobalSettings.get("mail.ftl.locked"));
+					mailVo.setUrl(GlobalSettings.get("contextpath"));
 					mailVo.setToken(token);
-					
 					boolean sendCheck = Mail.sendMail(mailVo);
 					if (!sendCheck) {
 						setErrorMessage("Send Mail Failed");
@@ -321,7 +322,6 @@ public class AccountsDao extends Base {
 		}
 		PreparedStatement pstmt = null;
 		try {
-			conn.setAutoCommit(false);
 			if (getFirstID() > 0) {
 				int is_locked = 1;
 				/*
@@ -355,45 +355,46 @@ public class AccountsDao extends Base {
 			pstmt.setString(6, apikey_hash);
 			int count = pstmt.executeUpdate();
 			if(count == 0) {
-				//에러메시지 추가 $this->setErrorMessage('Failed to create confirmation token');
-				throw new SQLException("not insert");
+				throw new SQLException();
 			} else {
-				//accounts_confirm_email_disabled == true 일경우 토큰, 이메일 발송 하지 않음
+				//accounts_confirm_email_disabled == true
 				
-				//accounts_confirm_email_disabled == false 
-				TokensDao tokensDao = TokensDao.getInstance();
-				String token = null;
-				int id = 0;
-				if((id = getUserId(conn, signUpVo.getEmail1())) != 0) {
-					token = tokensDao.createToken(conn, "confirm_email", id);
-				} else {
-					throw new SQLException("do not find id by email");
-				}
-				if (!token.equals("")) {
-					// 메일 발송
-					String url = request.getRequestURL().substring(0, (request.getRequestURL().length() - request.getServletPath().length()));
-					
-					MailVo mailVo = new MailVo();
-					mailVo.setEmail(signUpVo.getEmail1());
-					mailVo.setSubject("Confirm Your Registration");
-					mailVo.setContent(/*GlobalSettings.get()*/"");
-					mailVo.setUrl(url);
-					mailVo.setToken(token);
-					
-					boolean sendCheck = Mail.sendMail(mailVo);
-					if (!sendCheck) {
-						setErrorMessage("register Failed please try later");
-						throw new SQLException("register Failed please try later");
-					}
-				} else {
-					throw new SQLException("Unable to create confirm_email token");
-				}
+				//accounts_confirm_email_disabled == false 일경우 토큰, 이메일 발송 하지 않음
 				
 			}
-			conn.commit();
+			/*
+			if ($this->checkStmt($stmt) && $stmt->bind_param('sssissi', $username_clean, $password_hash, $email1, $signup_time, $pin_hash, $apikey_hash, $is_locked) && $stmt->execute()) {
+			      $new_account_id = $this->mysqli->lastused->insert_id;
+			      if (!is_null($coinaddress)) $this->coin_address->add($new_account_id, $coinaddress);
+			      if (! $this->setting->getValue('accounts_confirm_email_disabled') && $is_admin != 1) {
+			        if ($token = $this->token->createToken('confirm_email', $stmt->insert_id)) {
+			          $aData['username'] = $username_clean;
+			          $aData['token'] = $token;
+			          $aData['email'] = $email1;
+			          $aData['subject'] = 'E-Mail verification';
+			          if (!$this->mail->sendMail('register/confirm_email', $aData)) {
+			            $this->setErrorMessage('Unable to request email confirmation: ' . $this->mail->getError());
+			            return false;
+			          }
+			          return true;
+			        } else {
+			          $this->setErrorMessage('Failed to create confirmation token');
+			          $this->debug->append('Unable to create confirm_email token: ' . $this->token->getError());
+			          return false;
+			        }
+			      } else {
+			        return true;
+			      }
+			    } else {
+			      $this->setErrorMessage( 'Unable to register' );
+			      $this->debug->append('Failed to insert user into DB: ' . $this->mysqli->lastused->error);
+			      echo $this->mysqli->lastused->error;
+			      if ($stmt->sqlstate == '23000') $this->setErrorMessage( 'Username or email already registered' );
+			      return false;
+			    }
+			    */
 		} catch (SQLException e) {
-			//에러메시지 추가 $this->setErrorMessage('Failed to create confirmation');
-			conn.rollback();
+			//에러메시지 추가 $this->setErrorMessage('Failed to create confirmation token');
 			e.printStackTrace();
 			return false;
 		} finally {
@@ -409,5 +410,95 @@ public class AccountsDao extends Base {
 
 	private int getFirstID() {
 		return 1;
+	}
+
+	 
+	// 비밀번호 초기화 메일 전송
+	public boolean initResetPassword(Connection conn, String username) throws SQLException {
+		String name = getUserNameByEmail(conn, username);
+		if (username.trim().equals("")){
+			setErrorMessage("Username must not be empty");
+			return false;
+		}
+		if(checkEmail(username)){
+			if(name.equals("")){
+				setErrorMessage("Invalid username or password.");
+				return false;
+			}else{
+				username = name;
+			}
+		}
+		
+		String email = getUserEmail(conn, username); 
+		if(email.equals("")){
+			setErrorMessage("Please check your mail account to finish your password reset");
+			return false;
+		}
+		
+		TokensDao tokensDao = TokensDao.getInstance();
+		String token = tokensDao.createToken(conn, "password_reset", getUserId(conn, email));
+		if(token.equals("")){
+			setErrorMessage("Unable to setup token for password reset");
+			return false;
+		}
+		
+		MailVo mailVo = new MailVo();
+		mailVo.setUrl(GlobalSettings.get("contextpath"));
+		mailVo.setEmail(email);
+		mailVo.setToken(token);
+		mailVo.setSubject("Password Reset Request");
+		mailVo.setContent(GlobalSettings.get("mail.ftl.reset"));
+		mailVo.setUsername(name);
+		boolean sendCheck = Mail.sendMail(mailVo);
+		if (!sendCheck) {
+			setErrorMessage("Unable to send mail to your address");
+			return false;
+		}
+		return true;
+	}
+
+	
+	// Password Reset 
+	public boolean resetPassword(Connection conn, String token, String newPassword, String newPassword2) throws SQLException {
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		TokensDao tokensDao = TokensDao.getInstance();
+		TokensVo tokensVo = tokensDao.getToken(conn, token, "password_reset");
+		if(tokensVo != null){
+			if(!newPassword.equals(newPassword2)){
+				setErrorMessage("New passwords do not match");
+				return false;
+			}
+			if(newPassword.length() < 8){
+				setErrorMessage("New password is too short, please use more than 8 chars");
+				return false;
+			}
+			String new_hash = getHash(newPassword, 1, Converter.getRandomByte());
+			try{
+				pstmt = conn.prepareStatement("UPDATE "+this.table+" set pass = ? where id = ? LIMIT 1");
+				pstmt.setString(1, new_hash);
+				pstmt.setInt(2, tokensVo.getAccounts_id());
+				
+				int updateRow = pstmt.executeUpdate();
+				if(updateRow == 1){
+					int deleteRow = tokensDao.deleteToken(conn, tokensVo.getToken());
+					if(deleteRow == 1){
+						return true;
+					}else{
+						setErrorMessage("Unable to invalidate used token");
+					}
+				}else{
+					setErrorMessage("Unable to set new password or you chose the same password. Please use a different one.");
+				}
+			}finally{
+				CloseUtilities.close(rs);
+				CloseUtilities.close(pstmt);
+			}
+		}else{
+			setErrorMessage("Invalid token: " + tokensDao.getError());
+		}
+		
+	    return false;
 	}
 }

@@ -6,6 +6,7 @@ public class MailVo {
 	private String email;
 	private String url;
 	private String token;
+	private String username;
 	
 	public String getSubject() {
 		return subject;
@@ -36,6 +37,12 @@ public class MailVo {
 	}
 	public void setToken(String token) {
 		this.token = token;
+	}
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
 	}
 	
 }

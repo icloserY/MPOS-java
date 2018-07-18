@@ -5,8 +5,8 @@ import java.sql.*;
 import jdbc.*;
 
 public class Base {
-	protected String table = " ";
-	private String error = " ";
+	protected String table = "";
+	private String error = "";
 	
 	public void setErrorMessage(String error){
 		this.error = error;
@@ -62,7 +62,6 @@ public class Base {
 			}else {
 				pstmt.setString(1, value);
 			}
-			System.out.println("pstmt:"+pstmt.toString());
 			rs = pstmt.executeQuery();
 			if(rs.next()) {
 				resultValue = (searchType == 0) ? String.valueOf(rs.getInt(1)) : rs.getString(1);
@@ -71,7 +70,6 @@ public class Base {
 			CloseUtilities.close(rs);
 			CloseUtilities.close(pstmt);
 		}
-		System.out.println("resultValue : " + resultValue);
 		return resultValue;
 	}
 	
@@ -100,7 +98,6 @@ public class Base {
 				pstmt.setString(1, value);
 			}
 			pstmt.setInt(2, id);
-			System.out.println(pstmt.toString());
 			int insertCount = pstmt.executeUpdate();
 			if(insertCount == 0) {
 				throw new SQLException();

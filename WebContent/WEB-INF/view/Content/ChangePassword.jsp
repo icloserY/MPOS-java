@@ -1,6 +1,6 @@
 <div class="row">
 	<form class="col-md-4" role="form" method="POST" action="ChangePassword.do">
-		<input type="hidden" name="token" value="${request.token}">
+		<input type="hidden" name="token" value="${token}">
 		<input type="hidden" name="do" value="resetPassword">
 		<div class="panel panel-default">
 			<div class="panel-heading">
