@@ -1,18 +1,15 @@
 package command.auth;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.naming.*;
 import javax.servlet.http.*;
 
 import command.handler.*;
 import jdbc.*;
-import model.GlobalSettings;
-import model.Popup;
-import model.dao.AccountsDao;
+import model.*;
+import model.dao.*;
 import model.vo.*;
 
 public class SignUpComHan implements ComHanInterFace{
@@ -56,7 +53,6 @@ public class SignUpComHan implements ComHanInterFace{
 				CloseUtilities.close(conn);
 			}
 		}
-		System.out.println("SignUp process end");
 		return Content;
 	}
 	

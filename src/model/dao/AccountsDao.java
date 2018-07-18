@@ -2,8 +2,6 @@ package model.dao;
 
 import java.security.*;
 import java.sql.*;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.*;
 
 import javax.servlet.http.*;
@@ -430,6 +428,7 @@ public class AccountsDao extends Base {
 					}
 				}
 			}
+			conn.commit();
 		} catch (SQLException e) {
 			try {
 				conn.rollback();
