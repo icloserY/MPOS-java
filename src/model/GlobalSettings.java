@@ -8,4 +8,7 @@ public class GlobalSettings {
 	public static Map<String, String> getInstance() {
 		return settings;
 	}
+	public static String get(String key) {
+		return settings.get(key);
+	}
 }

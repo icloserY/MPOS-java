@@ -3,6 +3,7 @@ package model.dao;
 import java.security.*;
 import java.sql.*;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.*;
 
 import javax.servlet.http.*;
@@ -107,7 +108,7 @@ public class AccountsDao extends Base {
 		}
 		return returnValue;
 	}
- 
+
 	// get is_locked
 	public boolean isLocked(Connection conn, String name) throws SQLException {
 		String resultValue = "";
@@ -165,16 +166,13 @@ public class AccountsDao extends Base {
 				TokensDao tokensDao = TokensDao.getInstance();
 				String token = tokensDao.createToken(conn, "account_unlock", id);
 				if (!token.equals("")) {
-					// 메일 발송
-					String url = request.getRequestURL().substring(0, (request.getRequestURL().length() - request.getServletPath().length()));
-					
 					MailVo mailVo = new MailVo();
 					mailVo.setEmail(username);
 					mailVo.setSubject("Account auto-locked");
-					mailVo.setContent("mail.ftl.locked");
-					mailVo.setUrl(url);
+					mailVo.setContent(GlobalSettings.get("mail.ftl.locked"));
+					mailVo.setUrl(GlobalSettings.get("contextpath"));
 					mailVo.setToken(token);
-					
+
 					boolean sendCheck = Mail.sendMail(mailVo);
 					if (!sendCheck) {
 						setErrorMessage("Send Mail Failed");
@@ -278,66 +276,78 @@ public class AccountsDao extends Base {
 	public boolean register(Connection conn, SignUpVo signUpVo) {
 		// 약관 동의 안할시
 		if (signUpVo.getTac() == null || !signUpVo.getTac().equals("1")) {
+			this.setErrorMessage("You need to accept our Terms and Conditions");
 			return false;
 		}
 		// username이 40자리 넘어갈 시
 		if (signUpVo.getUsername().length() > 40) {
+			this.setErrorMessage("Username exceeding character limit");
 			return false;
 		}
 		// coin address가 이미 존재 하는지, 유효한지(RPC)
 		if (signUpVo.getCoinaddress() != null) {
 			if (!Coin_addressesDao.getInstance().existCoinAddress(conn, signUpVo.getCoinaddress())) {
+				this.setErrorMessage("Coin address is already taken");
 				return false;
 			}
 			// JSON RPC로 지갑에 등록된 주소인지 확인
+			// Coin address is not valid
+		} else {
+			this.setErrorMessage("You need to insert your Coin address");
+			return false;
 		}
 		// username이 정규식을 만족하는지
-		if (Pattern.matches("/^[a-z]+[a-z0-9]{5,19}$/g", signUpVo.getUsername())) {
+		if (!Pattern.matches("^[a-zA-Z]{1}[a-zA-Z0-9_]{4,11}$", signUpVo.getUsername())) {
+			this.setErrorMessage("Username may only contain alphanumeric characters");
 			return false;
 		}
 		// email이 중복될 시
 		if (existEmail(conn, signUpVo.getEmail1())) {
+			this.setErrorMessage("This e-mail address is already taken");
 			return false;
 		}
 		// password가 8자리 이하
 		if (signUpVo.getPassword1().length() < 8) {
+			this.setErrorMessage("Password is too short, minimum of 8 characters required");
 			return false;
 		}
 		// password1과 password2가 일치 하지 않을시
 		if (!signUpVo.getPassword1().equals(signUpVo.getPassword2())) {
+			this.setErrorMessage("Password do not match");
 			return false;
 		}
 		// email1이 비었거나 e-mail 형식에 맞지 않을시 아이디는 영문자로 시작하는 6~20자 영문자 또는 숫자이어야 합니다.
-		if (signUpVo.getEmail1() == null || checkEmail(signUpVo.getEmail1())) {
+		if (signUpVo.getEmail1() == null || !checkEmail(signUpVo.getEmail1())) {
+			this.setErrorMessage("invalid e-mail address");
 			return false;
 		}
 		// email1과 email2가 일치 하지 않을시
 		if (!signUpVo.getEmail1().equals(signUpVo.getEmail2())) {
+			this.setErrorMessage("E-mail do not match");
 			return false;
 		}
 		// pin이 숫자 정규식이 아니거나 길이가 4자리가 아닐시
-		if (Pattern.matches("/([^a-zA-Z0-9-_])/", signUpVo.getPin()) || signUpVo.getPin().length() != 4) {
+		if (!Pattern.matches("^[0-9]*$", signUpVo.getPin()) || signUpVo.getPin().length() != 4) {
+			this.setErrorMessage("Invalid PIN");
 			return false;
 		}
 		PreparedStatement pstmt = null;
+		int is_admin = 0;
 		try {
 			conn.setAutoCommit(false);
-			if (getFirstID() > 0) {
+			if (getFirstID(conn) > 0) {
 				int is_locked = 1;
-				/*
-				 * ! $this->setting->getValue('accounts_confirm_email_disabled') ? is_locked = 1
-				 * : is_locked = 0;
-				 */
-				int is_admin = 0;
+				is_locked = !GlobalSettings.get("accounts_confirm_email_disabled").equals("true") ? 1 : 0;
+				is_admin = 0;
 				pstmt = conn.prepareStatement(""
-						+ "INSERT INTO $this->table (username, pass, email, signup_timestamp, pin, api_key, is_locked) "
+						+ "INSERT INTO Accounts (username, pass, email, signup_timestamp, pin, api_key, is_locked) "
 						+ "VALUES (?, ?, ?, ?, ?, ?, ?)");
 				pstmt.setInt(7, is_locked);
 			} else {
 				int is_locked = 0;
-				int is_admin = 1;
+				is_admin = 1;
 				pstmt = conn.prepareStatement(""
-						+ "INSERT INTO $this->table (username, pass, email, signup_timestamp, pin, api_key, is_admin, is_locked)"
+						+ "INSERT INTO Accounts (username, pass, email, signup_timestamp, pin, api_key, is_admin, is_locked)"
 						+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)" + "");
 				pstmt.setInt(7, is_admin);
 				pstmt.setInt(8, is_locked);
@@ -346,7 +356,7 @@ public class AccountsDao extends Base {
 			String pin_hash = this.getHash(signUpVo.getPin(), 1, Converter.getRandomByte());
 			String apikey_hash = this.getHash(signUpVo.getUsername(), 0, null);
 			String username_clean = signUpVo.getUsername();
-			int signup_time = (int)System.currentTimeMillis() / 1000;
+			int signup_time = (int)(System.currentTimeMillis() / 1000);
 			pstmt.setString(1, username_clean);
 			pstmt.setString(2, password_hash);
 			pstmt.setString(3, signUpVo.getEmail1());
@@ -354,46 +364,64 @@ public class AccountsDao extends Base {
 			pstmt.setString(5, pin_hash);
 			pstmt.setString(6, apikey_hash);
 			int count = pstmt.executeUpdate();
-			if(count == 0) {
-				//에러메시지 추가 $this->setErrorMessage('Failed to create confirmation token');
-				throw new SQLException("not insert");
+			if (count == 0) {
+				this.setErrorMessage("register Failed please try later");
+				throw new SQLException("register Failed please try later");
 			} else {
-				//accounts_confirm_email_disabled == true 일경우 토큰, 이메일 발송 하지 않음
-				
-				//accounts_confirm_email_disabled == false 
-				TokensDao tokensDao = TokensDao.getInstance();
-				String token = null;
-				int id = 0;
-				if((id = getUserId(conn, signUpVo.getEmail1())) != 0) {
-					token = tokensDao.createToken(conn, "confirm_email", id);
-				} else {
-					throw new SQLException("do not find id by email");
-				}
-				if (!token.equals("")) {
-					// 메일 발송
-					String url = request.getRequestURL().substring(0, (request.getRequestURL().length() - request.getServletPath().length()));
-					
-					MailVo mailVo = new MailVo();
-					mailVo.setEmail(signUpVo.getEmail1());
-					mailVo.setSubject("Confirm Your Registration");
-					mailVo.setContent(/*GlobalSettings.get()*/"");
-					mailVo.setUrl(url);
-					mailVo.setToken(token);
-					
-					boolean sendCheck = Mail.sendMail(mailVo);
-					if (!sendCheck) {
-						setErrorMessage("register Failed please try later");
-						throw new SQLException("register Failed please try later");
+				if (signUpVo.getCoinaddress() != null)  {
+					int new_account_id = this.getLastUserId(conn, signUpVo.getUsername());
+					if(new_account_id == 0) {
+						this.setErrorMessage("Coin address register Failed please try later");
+						throw new SQLException("select lastestuser failed");
 					}
-				} else {
-					throw new SQLException("Unable to create confirm_email token");
+					boolean success = Coin_addressesDao.getInstance().add(conn, new_account_id, signUpVo.getCoinaddress(), null);
+					if(!success) {
+						this.setErrorMessage("register Failed please try later");
+						throw new SQLException("coin_address failed insert");
+					}
 				}
-				
+				// accounts_confirm_email_disabled == true 일경우 토큰, 이메일 발송 하지 않음
+				if (GlobalSettings.get("accounts_confirm_email_disabled").equals("true")) {
+					
+				} else if(GlobalSettings.get("accounts_confirm_email_disabled").equals("false") && is_admin != 1){
+					// accounts_confirm_email_disabled == false
+					TokensDao tokensDao = TokensDao.getInstance();
+					String token = null;
+					int id = 0;
+					if ((id = getUserId(conn, signUpVo.getEmail1())) != 0) {
+						token = tokensDao.createToken(conn, "confirm_email", id);
+					} else {
+						this.setErrorMessage("do not find id by email");
+						throw new SQLException("do not find id by email");
+					}
+					if (!token.equals("")) {
+						// 메일 발송
+						MailVo mailVo = new MailVo();
+						mailVo.setSubject("Confirm Your Registration");
+						mailVo.setContent(GlobalSettings.get("mail.ftl.confirm.email"));
+						mailVo.setEmail(signUpVo.getEmail1());
+						mailVo.setUrl(GlobalSettings.get("contextpath"));
+						mailVo.setToken(token);
+
+						boolean sendCheck = Mail.sendMail(mailVo);
+						if (!sendCheck) {
+							this.setErrorMessage("register Failed please try later");
+							throw new SQLException("email send failed");
+						}
+					} else {
+						this.setErrorMessage("Unable to create confirm_email token");
+						throw new SQLException("Unable to create confirm_email token");
+					}
+				}
 			}
 			conn.commit();
 		} catch (SQLException e) {
-			//에러메시지 추가 $this->setErrorMessage('Failed to create confirmation');
-			conn.rollback();
+			try {
+				conn.rollback();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			e.printStackTrace();
 			return false;
 		} finally {
@@ -403,11 +431,43 @@ public class AccountsDao extends Base {
 	}
 
 	private boolean existEmail(Connection conn, String email) {
-
-		return true;
+		String value = "";
+		try {
+			value = this.getSingle(conn, email, "email", "email", 1, 1, false);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(value.isEmpty()) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 
-	private int getFirstID() {
+	private int getFirstID(Connection conn) {
 		return 1;
+	}
+	
+	private int getLastUserId(Connection conn, String username) {
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		int id = 0;
+		try {
+			pstmt = conn.prepareStatement(""
+					+ "Select id from accounts order by id desc limit 1");
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				id = rs.getInt(1);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return 0;
+		} finally {
+			CloseUtilities.close(pstmt);
+			CloseUtilities.close(rs);
+		}
+		return id;
 	}
 }

@@ -20,13 +20,13 @@ public class Mail {
 		props.put("mail.smtp.host", "smtp.daum.net");
 		props.put("mail.smtp.port", 465);
 		props.put("mail.smtp.auth", "true");*/
-		String user = "dksk73@naver.com";
-		String password = "hhc3698";
+		String user = GlobalSettings.get("mail.user");
+		String password = GlobalSettings.get("mail.password");
 		
 		Properties props = new Properties();
-		props.put("mail.smtp.host", "smtp.naver.com");
-		props.put("mail.smtp.port", 587);
-		props.put("mail.smtp.auth", "true");
+		props.put("mail.smtp.host", GlobalSettings.get("mail.smtp.host"));
+		props.put("mail.smtp.port", GlobalSettings.get("mail.smtp.port"));
+		props.put("mail.smtp.auth", GlobalSettings.get("mail.smtp.auth"));
 		
 		Session session = Session.getDefaultInstance(props, new javax.mail.Authenticator(){
 			protected PasswordAuthentication getPasswordAuthentication(){
@@ -42,11 +42,11 @@ public class Mail {
 			
 			message.setSubject(mailVo.getSubject());
 			Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
-			cfg.setDirectoryForTemplateLoading(new File("C:/Users/LG/workspace/TestJSP/WebContent/WEB-INF/view/mail"));
+			cfg.setDirectoryForTemplateLoading(new File(GlobalSettings.get("mail.contextpath")));
 			cfg.setDefaultEncoding("UTF-8");
 			cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);  
 			
-			Template template = cfg.getTemplate("locked.ftl");
+			Template template = cfg.getTemplate(mailVo.getContent());
 			Writer writer = new StringWriter();
 			template.process(mailVo, writer);
 			message.setContent(writer.toString(), "text/html; charset=utf-8");

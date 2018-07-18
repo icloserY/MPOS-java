@@ -63,16 +63,9 @@ public class DispatcherServlet extends HttpServlet {
 	}	
 	
 	private void process(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String url = request.getRequestURL().substring(0, (request.getRequestURL().length() - request.getServletPath().length()));
+		String url = "http://" + request.getLocalAddr() + ":" + request.getLocalPort() + request.getContextPath();
 		if(!globalSettings.get("contextpath").equals(url)) {
 			globalSettings.replace("contextpath", url);
-		}
-		Iterator<String> keyIter = globalSettings.keySet().iterator();
-		while(keyIter.hasNext()) {
-			String key = (String)keyIter.next();
-			String value = globalSettings.get(key);
-			globalSettings.put(key, value);
-			System.out.println(key + " : " + value);
 		}
 		String command = request.getRequestURI();
 		if(command.indexOf(request.getContextPath()) == 0) {

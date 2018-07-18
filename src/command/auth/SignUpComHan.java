@@ -1,12 +1,18 @@
 package command.auth;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import javax.naming.*;
 import javax.servlet.http.*;
 
 import command.handler.*;
 import jdbc.*;
+import model.GlobalSettings;
+import model.Popup;
+import model.dao.AccountsDao;
 import model.vo.*;
 
 public class SignUpComHan implements ComHanInterFace{
@@ -17,20 +23,40 @@ public class SignUpComHan implements ComHanInterFace{
 		String Content = request.getMethod().equals("GET") ? "/WEB-INF/view/Content/SignUp.jsp" 
 															: request.getMethod().equals("POST") ? "Login.do"
 															: null;
+		boolean flag = true;
 		if(request.getMethod().equals("POST")) {
+			@SuppressWarnings("unchecked")
+			List<Map<String, String>> popups = (ArrayList<Map<String, String>>) request.getAttribute("Errors") == null
+					? new ArrayList<Map<String, String>>() : (ArrayList<Map<String, String>>) request.getAttribute("Errors");
+			Map<String, String> popup = null;
 			SignUpVo signUpVo = mappingToRequest(request);
+			AccountsDao accountsDao = AccountsDao.getInstance();
 			Connection conn = null;
 			try {
 				conn = JDBCConnection.getConnection();
-				//boolean complete = AccountsDao.getInstance().register(conn, signUpVo);
-				
+				boolean complete = accountsDao.register(conn, signUpVo);
+				if(complete) {
+					Content = "Login.do";
+				}else {
+					flag = false;
+					Content = "/WEB-INF/view/Content/SignUp.jsp";
+				}
 			} catch (NamingException|SQLException e) {
-				// TODO Auto-generated catch block
+				flag = false;
+				Content = "/WEB-INF/view/Content/SignUp.jsp";
 				e.printStackTrace();
 			} finally {
+				if(flag) {
+					popup = Popup.getPopup("Complete Signup: " + "Check your email and confirm your registration", GlobalSettings.get("popup.info"), null, "yes");
+				}else {
+					popup = Popup.getPopup("Unable to signup: " + accountsDao.getError(), GlobalSettings.get("popup.danger"), null, null);
+				}
+				popups.add(popup);
+				request.setAttribute("Errors", popups);
 				CloseUtilities.close(conn);
 			}
-		} 
+		}
+		System.out.println("SignUp process end");
 		return Content;
 	}
 	

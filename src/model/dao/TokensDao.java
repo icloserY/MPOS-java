@@ -42,7 +42,7 @@ public class TokensDao extends Base {
 			throw new SQLException();
 		}
 		
-		return resultValue;
+		return strToken;
 	}
 	
 	

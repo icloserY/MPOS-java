@@ -71,8 +71,6 @@ public class LoginComHan implements ComHanInterFace {
 			// 로그인 실패 Login.do로 다시 보냄
 			request.setAttribute("Errors", popups);
 			request.setAttribute("active", true);
-			popup = Popup.getPopup("Unable to login: ", "alert alert-danger", null, null);
-			popups.add(popup);
 			return "/WEB-INF/view/Content/Login.jsp";
 		}
 		

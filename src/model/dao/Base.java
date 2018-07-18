@@ -5,8 +5,8 @@ import java.sql.*;
 import jdbc.*;
 
 public class Base {
-	protected String table = " ";
-	private String error = " ";
+	protected String table = "";
+	private String error = "";
 	
 	public void setErrorMessage(String error){
 		this.error = error;

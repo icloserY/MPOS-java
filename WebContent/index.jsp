@@ -70,29 +70,35 @@
 				<c:set var="classNameHead" value="alert-dismissable " />
 				<c:set var="classNameTail" value=" autohide " />
 				<c:forEach var="popup" items="${Errors}">
-				<c:set var="classNameDefault" value="${popup.get('Type')}" />
-					<c:if test="${popup.get('Dismiss') == 'yes'}">
-						<c:set var="className" value="${classNameHead} ${classNameDefault}" />
-					</c:if>
-					<c:set var="className" value="${classNameDefault }" />
+					<c:set var="classNameDefault" value="${popup.get('Type')}" />
+					<c:choose>
+						<c:when test="${popup.get('Dismiss') == 'yes'}">
+							<c:set var="className"
+								value="${classNameHead} ${classNameDefault}" />
+						</c:when>
+						<c:otherwise>
+							<c:set var="className" value="${classNameDefault }" />
+						</c:otherwise>
+					</c:choose>
+
 					<div class="${className}" id="${popup.get('ID')}">
 						<c:if test="${popup.get('Dismiss') == 'yes'}">
 							<button id="${popup.get('ID')}" type="button" class="close"
 								data-dismiss="alert" aria-hidden="true">&times;</button>
 						</c:if>
 						<c:choose>
-						<c:when test="${popup.get('Type') == 'alert alert-info'}">
-						<span class="glyphicon glyphicon-info-sign">&nbsp;</span>
-						</c:when>
-						<c:when test="${popup.get('Type') == 'alert alert-warning'}">
-						<span class="glyphicon glyphicon-info-sign">&nbsp;</span>
-						</c:when>
-						<c:when test="${popup.get('Type') == 'alert alert-danger'}">
-						<span class="glyphicon glyphicon-remove-circle">&nbsp;</span>
-						</c:when>
-						<c:when test="${popup.get('Type') == 'alert alert-success'}">
-						<span class="glyphicon glyphicon-ok-circle">&nbsp;</span>
-						</c:when>
+							<c:when test="${popup.get('Type') == 'alert alert-info'}">
+								<span class="glyphicon glyphicon-info-sign">&nbsp;</span>
+							</c:when>
+							<c:when test="${popup.get('Type') == 'alert alert-warning'}">
+								<span class="glyphicon glyphicon-info-sign">&nbsp;</span>
+							</c:when>
+							<c:when test="${popup.get('Type') == 'alert alert-danger'}">
+								<span class="glyphicon glyphicon-remove-circle">&nbsp;</span>
+							</c:when>
+							<c:when test="${popup.get('Type') == 'alert alert-success'}">
+								<span class="glyphicon glyphicon-ok-circle">&nbsp;</span>
+							</c:when>
 						</c:choose>
 						${popup.get('Content')}
 					</div>
