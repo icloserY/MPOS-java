@@ -7,9 +7,10 @@ import javax.mail.*;
 import javax.mail.internet.*;
 
 import freemarker.template.*;
+import model.dao.*;
 import model.vo.*;
 
-public class Mail {
+public class Mail extends Base{
 
 	
 	public static boolean sendMail(MailVo mailVo){
@@ -30,11 +31,17 @@ public class Mail {
 		
 		try{
 			MimeMessage message = new MimeMessage(session);
-			message.setFrom(new InternetAddress(user));
-			message.addRecipient(Message.RecipientType.TO, new InternetAddress( mailVo.getEmail() ));
-			
-			
 			message.setSubject(mailVo.getSubject());
+			message.setFrom(new InternetAddress(user));
+			
+			if(mailVo.getContactform() == 1){  // contactform 메일 발송
+				message.addRecipient(Message.RecipientType.TO, new InternetAddress( user ));
+				message.setReplyTo(new Address[]{new InternetAddress(mailVo.getEmail())});
+				
+			}else{ // 일반 메일 발송
+				message.addRecipient(Message.RecipientType.TO, new InternetAddress( mailVo.getEmail() ));
+			}
+
 			Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
 			cfg.setDirectoryForTemplateLoading(new File(GlobalSettings.get("mail.contextpath")));
 			cfg.setDefaultEncoding("UTF-8");
@@ -44,6 +51,7 @@ public class Mail {
 			Writer writer = new StringWriter();
 			template.process(mailVo, writer);
 			message.setContent(writer.toString(), "text/html; charset=utf-8");
+			
 			Transport.send(message);
 			
 			return true;
@@ -54,4 +62,34 @@ public class Mail {
 		
 		
 	}
+	
+	public boolean contactform(String senderName, String senderEmail, String senderSubject, String senderMessage){
+		AccountsDao accountsDao = AccountsDao.getInstance();
+		
+		if(senderEmail.trim().equals("") || !accountsDao.checkEmail(senderEmail)){
+			setErrorMessage(GlobalSettings.get("error.E0023"));
+			return false;
+		}
+		
+		if(senderMessage.replaceAll("\\<.*?\\>", "").length() < senderMessage.length()){
+			setErrorMessage(GlobalSettings.get("error.E0024"));
+			return false;
+		}
+		
+		MailVo mailVo = new MailVo();
+		mailVo.setContactform(1);
+		mailVo.setEmail(senderEmail);
+		mailVo.setUsername(senderName);
+		mailVo.setSubject(senderSubject);
+		mailVo.setContent(GlobalSettings.get("mail.ftl.contactform"));
+		mailVo.setMessage(senderMessage);
+		
+		if(Mail.sendMail(mailVo)){
+			return true;
+		} else{
+			setErrorMessage("Unable to send email");
+			return false;
+		}
+	}
+	
 }

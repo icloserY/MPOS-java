@@ -7,6 +7,8 @@ public class MailVo {
 	private String url;
 	private String token;
 	private String username;
+	private String message;
+	private int contactform;
 	
 	public String getSubject() {
 		return subject;
@@ -43,6 +45,18 @@ public class MailVo {
 	}
 	public void setUsername(String username) {
 		this.username = username;
+	}
+	public int getContactform() {
+		return contactform;
+	}
+	public void setContactform(int contactform) {
+		this.contactform = contactform;
+	}
+	public String getMessage() {
+		return message;
+	}
+	public void setMessage(String message) {
+		this.message = message;
 	}
 	
 }

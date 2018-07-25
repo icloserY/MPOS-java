@@ -2,7 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <script>
-  var zxcvbnPath = "./Resources/site_assets/bootstrap/js/zxcvbn/zxcvbn.js";
+  var zxcvbnPath = "{$PATH}/js/zxcvbn/zxcvbn.js";
 </script>
 <script type="text/javascript" src="{$PATH}/js/pwcheck.js"></script>
 <div class="row">
@@ -22,37 +22,37 @@
           <label>Username</label>
           <div class="input-group  input-group-sm">
             <span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
-            <input type="text" class="form-control" name="username" placeholder="Username" value="pitcherN" size="15" maxlength="20" required>
+            <input type="text" class="form-control" name="username" placeholder="Username" value="" size="15" maxlength="20" required>
           </div>
           <label>Coin Address</label>
           <div class="input-group input-group-sm">
             <span class="input-group-addon"><i class="fa fa-money fa-fw"></i></span>
-            <input type="text" name="coinaddress" placeholder="Coin Address" class="form-control" value="egerbgesb" size="15" required>
+            <input type="text" name="coinaddress" placeholder="Coin Address" class="form-control" value="" size="15" required>
           </div>
           <label>Password</label> (<span id="pw_strength">Strength</span>)
           <div class="input-group input-group-sm">
             <span class="input-group-addon"><i class="fa fa-key fa-fw"></i></span>
-            <input type="password" class="form-control" name="password1" placeholder="Password" value="anfqud0303" size="15" maxlength="100" id="pw_field" required>
+            <input type="password" class="form-control" name="password1" placeholder="Password" value="" size="15" maxlength="100" id="pw_field" required>
           </div>
           <span id="pw_match"></span>
           <div class="input-group input-group-sm">
             <span class="input-group-addon" id="pw_match"><i class="fa fa-key fa-fw"></i></span>
-            <input type="password" class="form-control" name="password2" placeholder="Repeat Password" value="anfqud0303" size="15" maxlength="100" id="pw_field2" required>
+            <input type="password" class="form-control" name="password2" placeholder="Repeat Password" value="" size="15" maxlength="100" id="pw_field2" required>
           </div>
           <label>Email</label>
           <div class="input-group input-group-sm">
             <span class="input-group-addon"><i class="fa fa-envelope-o fa-fw"></i></span>
-            <input type="text" name="email1" placeholder="Email" class="form-control" value="pitcher0303@gmail.com" size="15" required>
+            <input type="text" name="email1" placeholder="Email" class="form-control" value="" size="15" required>
           </div>
           <div class="input-group input-group-sm">
             <span class="input-group-addon"><i class="fa fa-envelope-o fa-fw"></i></span>
-            <input type="text" class="form-control" name="email2" placeholder="Repeat Email" value="pitcher0303@gmail.com" size="15" required>
+            <input type="text" class="form-control" name="email2" placeholder="Repeat Email" value="" size="15" required>
           </div>
           <label>PIN</label>
           <font size="1">Four digit number. <b>Remember this pin!</b></font>
           <div class="input-group input-group-sm">
             <span class="input-group-addon"><i class="fa fa-shield fa-fw"></i></span>
-            <input type="password" class="form-control" name="pin" placeholder="PIN" value="1234" size="4" maxlength="4" required>
+            <input type="password" class="form-control" name="pin" placeholder="PIN" value="" size="4" maxlength="4" required>
           </div>
           <div class="input-group input-group-sm">
             <label>
@@ -76,7 +76,7 @@
           <h4 class="modal-title" id="TACLabel">Terms and Conditions</h4>
         </div>
         <div class="modal-body">
-          <jsp:include page="/WEB-INF/view/tac/default.jsp"/>
+          <jsp:include page="/WEB-INF/view/Content/Tac.jsp"/>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
