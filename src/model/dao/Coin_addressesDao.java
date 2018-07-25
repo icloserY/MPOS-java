@@ -1,11 +1,9 @@
 package model.dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 
-import jdbc.CloseUtilities;
-import model.Converter;
+import jdbc.*;
+import model.*;
 
 public class Coin_addressesDao extends Base {
 	public Coin_addressesDao() {
@@ -59,5 +57,30 @@ public class Coin_addressesDao extends Base {
 		} finally {
 			CloseUtilities.close(pstmt);
 		}
+	}
+
+	public String getCoinAddress(Connection conn, int id) {
+		String resultValue = "";
+		String currency = GlobalSettings.get("currency");
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;	
+		try {
+			pstmt = conn.prepareStatement("SELECT coin_address from "+this.table+" where account_id = ? AND currency = ?");
+			pstmt.setInt(1, id);
+			pstmt.setString(2, currency);
+			
+			rs = pstmt.executeQuery();
+			if(rs.next()){
+				resultValue = rs.getString(1);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			CloseUtilities.close(pstmt);
+		}
+		
+		
+		return resultValue;
 	}
 }

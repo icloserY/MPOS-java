@@ -83,6 +83,7 @@ public class DispatcherServlet extends HttpServlet {
 			String activeSide = getSide(command);
 			request.setAttribute("Content", Content);
 			request.setAttribute(activeSide, true);
+			request.setAttribute("titleValue", activeSide);
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/index.jsp");
 			dispatcher.forward(request, response);
 		}
@@ -92,14 +93,14 @@ public class DispatcherServlet extends HttpServlet {
 		
 		if(command.equals("/EditAccount.do") || command.equals("/MyWorkers.do") || command.equals("/Transactions.do") || command.equals("/Earnings.do") || command.equals("/Notifications.do")
 				|| command.equals("/Invitaions.do") || command.equals("/QRcodes.do")){
-			activeSide = "MyAccount";
+			activeSide = "Account";
 		}else if(command.equals("")){
 			
-		}else if(command.equals("/Pool.do") || command.equals("/Blocks.do") || command.equals("/Round.do") || command.equals("/Blockfinder.do") || command.equals("/Uptime") || command.equals("/Graphs.do") || command.equals("/Donors.do") ){
+		}else if(command.equals("/Pool.do") || command.equals("/Blocks.do") || command.equals("/Round.do") || command.equals("/Blockfinder.do") || command.equals("/Uptime.do") || command.equals("/Graphs.do") || command.equals("/Donors.do") ){
 			activeSide = "Statistics";
-		}else if(command.equals("/GettingStarted.do") || command.equals("/About.do")){
+		}else if(command.equals("/Gettingstarted.do") || command.equals("/About.do")){
 			activeSide = "Help";
-		}else if(command.equals("/Logout.do") || command.equals("/Contact.do") || command.equals("/Tac.do") || command.equals("/Login.do") || command.equals("/SignUp.do")){
+		}else if(command.equals("/Logout.do") || command.equals("/Contactform.do") || command.equals("/Tac.do") || command.equals("/Login.do") || command.equals("/SignUp.do")){
 			activeSide = "Other";
 		}else{
 			activeSide = "";

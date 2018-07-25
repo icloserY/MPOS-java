@@ -76,7 +76,7 @@
           <h4 class="modal-title" id="TACLabel">Terms and Conditions</h4>
         </div>
         <div class="modal-body">
-          <jsp:include page="/WEB-INF/view/tac/default.jsp"/>
+          <jsp:include page="/WEB-INF/view/Content/Tac.jsp"/>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>

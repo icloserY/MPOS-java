@@ -22,6 +22,12 @@ public class AccountsDao extends Base {
 		return accountsDao;
 	}
 
+	public String getUserName(Connection conn, int id ) throws SQLException{
+		String resultValue = "";
+		resultValue = getSingle(conn, String.valueOf(id), "username", "id", 0, 1, false);
+		return resultValue;
+	}
+	
 	private String getUserEmail(Connection conn, String username) throws SQLException {
 		String resultValue = "";
 		resultValue = getSingle(conn, username, "email", "username", 1, 1, true);
@@ -234,7 +240,7 @@ public class AccountsDao extends Base {
 	}
 
 	/* 이메일 형식 체크 */
-	private boolean checkEmail(String email) {
+	public boolean checkEmail(String email) {
 		String regex = "^[_a-zA-Z0-9-\\.]+@[\\.a-zA-Z0-9-]+\\.[a-zA-Z]+$";
 		Pattern p = Pattern.compile(regex);
 		Matcher m = p.matcher(email);
@@ -579,5 +585,24 @@ public class AccountsDao extends Base {
 		
 		request.getSession().invalidate();
 		 
+	}
+
+	
+	/* 사용자 인증 및 로그인 가능여부 체크 
+	 * session 확인
+	 * 계정이 잠긴 경우 session 파괴 */
+	public boolean isAuthenticated(Connection conn, boolean logout, HttpServletRequest request) throws SQLException {
+		HttpSession session = request.getSession();
+		int authenticated = session.getAttribute("AUTHENTICATED") != null ? (int) session.getAttribute("AUTHENTICATED") : 0;
+		AccountsVo userData = session.getAttribute("USERDATA") != null ? (AccountsVo) session.getAttribute("USERDATA") : null;
+		if (authenticated == 1 && !isLocked(conn, userData.getUsername())
+				&& getUserIp(conn, userData.getId()).equals(request.getRemoteAddr())) {
+			return true;
+		}
+
+		if (logout) {
+			logoutUser(request);
+		}
+		return false;
 	}
 }

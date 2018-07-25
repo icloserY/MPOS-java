@@ -28,9 +28,9 @@
                     <ul class="dropdown-menu dropdown-user">
                     	<c:choose>
                     		<c:when test="${AUTHENTICATED == 1 }">
-		                        <li><a href="{$smarty.server.SCRIPT_NAME}?page=dashboard"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
+		                        <li><a href="DashBoard.do"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
 		                        <li><a href="{$smarty.server.SCRIPT_NAME}?page=account&action=edit"><i class="fa fa-gear fa-fw"></i> Settings</a>
-		                        <li><a href="{$smarty.server.SCRIPT_NAME}?page=account&action=workers"><i class="fa fa-desktop fa-fw"></i> Workers</a>
+		                        <li><a href="Myworkers.do"><i class="fa fa-desktop fa-fw"></i> Workers</a>
 		                        </li>
 		                        <li class="divider"></li>
 		                        <li><a href="Logout.do"><i class="fa fa-sign-out fa-fw"></i> Logout</a>

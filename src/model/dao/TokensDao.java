@@ -21,7 +21,6 @@ public class TokensDao extends Base {
 
 	public String createToken(Connection conn, String strType, int account_id) throws SQLException {
 		PreparedStatement pstmt = null;
-		ResultSet rs = null;
 		String resultValue = "";
 		int tokenId = token_typesDao.getTypeId(conn, strType);
 		if (tokenId == 0) {

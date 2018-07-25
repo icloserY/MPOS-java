@@ -9,9 +9,9 @@
                         <a href="index.jsp"><i class="fa fa-home fa-fw"></i> Home</a>
                     </li>
                     <!-- 로그인시 -->
-                    <c:if test="로그인 시 ">
+                    <c:if test="${AUTHENTICATED == 1 }">
                     <li>
-                        <a href="{$smarty.server.SCRIPT_NAME}?page=dashboard"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
+                        <a href="DashBoard.do"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
                     </li>
 					<%-- account가 현재 활성화 page일때 
 					    <li class="${getPage eq "account" ? "active" : "" }"> --%>
@@ -19,7 +19,7 @@
                         <a href="#"><i class="fa fa-user-md fa-fw"></i> My Account<span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
                           <li><a href="{$smarty.server.SCRIPT_NAME}?page=account&action=edit"><i class="fa fa-edit fa-fw"></i> Edit Account</a></li>
-                          <li><a href="{$smarty.server.SCRIPT_NAME}?page=account&action=workers"><i class="fa fa-desktop fa-fw"></i> My Workers</a></li>
+                          <li><a href="Myworkers.do"><i class="fa fa-desktop fa-fw"></i> My Workers</a></li>
                           <li><a href="{$smarty.server.SCRIPT_NAME}?page=account&action=transactions"><i class="fa fa-credit-card fa-fw"></i> Transactions</a></li>
                           <li><a href="{$smarty.server.SCRIPT_NAME}?page=account&action=earnings"><i class="fa fa-money fa-fw"></i> Earnings</a></li>
                           <li><a href="{$smarty.server.SCRIPT_NAME}?page=account&action=notifications"><i class="fa fa-bullhorn fa-fw"></i> Notifications</a></li>
@@ -30,7 +30,7 @@
                     </li>
                     </c:if>
                     <!-- 로그인 상태이고, admin 계정일 때 -->
-                    <c:if test="admin계정 로그인">
+                    <c:if test="${AUTHENTICATED == 1 and USERDATA.is_admin == 1}">
 					<%-- admin이 현재 활성화 page일때
 					      <li class="${getPage eq "admin" ? "active" : "" }"> --%>
 					<li class="${false ? 'active' : '' }"> 
@@ -85,13 +85,13 @@
 					<li class="${ Statistics ? 'active' : '' }" >
                         <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Statistics<span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
-                          <li><a href="/index.php?page=statistics&action=pool"><i class="fa fa-align-left fa-fw"></i> Pool</a></li>
-                          <li><a href="/index.php?page=statistics&action=blocks"><i class="fa fa-th-large fa-fw"></i> Blocks</a></li>
-                          <li><a href="/index.php?page=statistics&action=round"><i class="fa fa-refresh fa-fw"></i> Round</a></li>
-                          <li><a href="/index.php?page=statistics&action=blockfinder"><i class="fa fa-search fa-fw"></i> Blockfinder</a></li>
-                          <li><a href="/index.php?page=statistics&action=uptime"><i class="fa fa-clock-o fa-fw"></i> Uptime</a></li>
-                          <li><a href="/index.php?page=statistics&action=graphs"><i class="fa fa-signal fa-fw"></i> Graphs</a></li>
-                          <li><a href="/index.php?page=statistics&action=donors"><i class="fa fa-bitbucket fa-fw"></i> Donors</a></li>
+                          <li><a href="Pool.do"><i class="fa fa-align-left fa-fw"></i> Pool</a></li>
+                          <li><a href="Blocks.do"><i class="fa fa-th-large fa-fw"></i> Blocks</a></li>
+                          <li><a href="Round.do"><i class="fa fa-refresh fa-fw"></i> Round</a></li>
+                          <li><a href="Blockfinder.do"><i class="fa fa-search fa-fw"></i> Blockfinder</a></li>
+                          <li><a href="Uptime.do"><i class="fa fa-clock-o fa-fw"></i> Uptime</a></li>
+                          <li><a href="Graphs.do"><i class="fa fa-signal fa-fw"></i> Graphs</a></li>
+                          <li><a href="Donors.do"><i class="fa fa-bitbucket fa-fw"></i> Donors</a></li>
                         </ul>
                         <!-- /.nav-second-level -->
                     </li>
@@ -99,8 +99,8 @@
 					<li class="${ Help ? 'active' : '' }" >
                         <a href="#"><i class="fa fa-question fa-fw"></i> Help<span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
-                          <li><a href="{$smarty.server.SCRIPT_NAME}?page=gettingstarted"><i class="fa fa-question fa-fw"></i> Getting Started</a></li>
-                          <li><a href="/index.php?page=about&action=pool"><i class="fa fa-info fa-fw"></i> About</a></li>
+                          <li><a href="Gettingstarted.do"><i class="fa fa-question fa-fw"></i> Getting Started</a></li>
+                          <li><a href="About.do?action=pool"><i class="fa fa-info fa-fw"></i> About</a></li>
                         </ul>
                         <!-- /.nav-second-level -->
                     </li>
@@ -120,8 +120,8 @@
 	                          <li><a href="SignUp.do"><i class="fa fa-pencil fa-fw"></i> Sign Up</a></li>
                           	</c:when>
                           </c:choose>
-                          <li><a href="/index.php?page=contactform&action="><i class="fa fa-envelope fa-fw"></i> Contact</a></li>
-                          <li><a href="{$smarty.server.SCRIPT_NAME}?page=tac"><i class="fa fa-book fa-fw"></i> Terms and Conditions</a></li>
+                          <li><a href="Contactform.do"><i class="fa fa-envelope fa-fw"></i> Contact</a></li>
+                          <li><a href="Tac.do"><i class="fa fa-book fa-fw"></i> Terms and Conditions</a></li>
                         </ul>
                         <!-- /.nav-second-level -->
                     </li>
