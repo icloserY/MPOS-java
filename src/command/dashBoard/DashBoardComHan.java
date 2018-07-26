@@ -37,7 +37,7 @@ public class DashBoardComHan implements ComHanInterFace {
 				int dDifficulty = 1;
 				int aRoundShares = 1;
 				
-				aRoundShares = statisticsDao.getRoundShares(conn);  
+			//	aRoundShares = statisticsDao.getRoundShares(conn);  
 				
 				int isBlock = 0;
 				

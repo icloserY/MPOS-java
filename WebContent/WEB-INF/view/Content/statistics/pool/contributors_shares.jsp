@@ -1,3 +1,5 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
   <div class="col-lg-6">
     <div class="panel panel-info">
       <div class="panel-heading">
@@ -14,24 +16,65 @@
             </tr>
           </thead>
           <tbody>
-{assign var=rank value=1}
-{assign var=listed value=0}
-{section shares $CONTRIBSHARES}
-            {if $GLOBAL.userdata.username|default:""|lower == $CONTRIBSHARES[shares].account|lower}{assign var=listed value=1}<tr class="success">{else}<tr>{/if}
-              <td>{$rank++}</td>
-              <td>{if $CONTRIBSHARES[shares].donate_percent|default:"0" >= 2}<i class="fa fa-trophy fa-fw"></i>{else if $CONTRIBSHARES[shares].donate_percent|default:"0" < 2 AND $CONTRIBSHARES[shares].donate_percent|default:"0" > 0}<i class="fa fa-star-o fa-fw"></i>{else}<i class="fa fa-ban fa-fw"></i>{/if}</td>
-              <td>{if $CONTRIBSHARES[shares].is_anonymous|default:"0" == 1 && $GLOBAL.userdata.is_admin|default:"0" == 0}anonymous{else}{$CONTRIBSHARES[shares].account|escape}{/if}</td>
-              <td class="text-right">{$CONTRIBSHARES[shares].shares|number_format:$GLOBAL.config.sharediffprecision}</td>
-            </tr>
-{/section}
-{if $listed != 1 && $GLOBAL.userdata.username|default:"" && $GLOBAL.userdata.shares.valid|default:"0" > 0}
-            {if $GLOBAL.userdata.username|default:""|lower == $CONTRIBHASHES[contrib].account|default:""|lower}{assign var=listed value=1}<tr class="success">{else}<tr>{/if}
-              <td>n/a</td>
-              <td>{if $GLOBAL.userdata.donate_percent|default:"0" >= 2}<i class="fa fa-trophy fa-fw"></i>{elseif $GLOBAL.userdata.donate_percent|default:"0" < 2 AND $GLOBAL.userdata.donate_percent|default:"0" > 0}<i class="fa fa-star-o fa-fw"></i>{else}<i class="fa fa-ban fa-fw"></i>{/if}</td>
-              <td>{$GLOBAL.userdata.username|escape}</td>
-              <td class="text-right">{$GLOBAL.userdata.shares.valid|number_format:$GLOBAL.config.sharediffprecision}</td>
-            </tr>
-{/if}
+		  <c:set var="rank" value="1"/>
+		  <c:set var="listed" value="0"/>
+		  <c:forEach var="shares" items="${CONTRIBSHARES }" >
+		  	<c:set var="classVar" value=""/>
+		  	<c:if test="${USERDATA.username eq shares.account }">
+		  		<c:set var="listed" value="1"/>
+		  		<c:set var="classVar" value="success"/>
+		  	</c:if>
+		  	<tr class="${classVar }">
+			  	<c:set var="rank" value="${rank + 1 }"/>
+			  	<td>${rank }</td>
+			  	<td>
+			  	<c:choose>
+			  		<c:when test="${shares.donate_percent >= 2}">
+			  			<i class="fa fa-trophy fa-fw"></i>
+			  		</c:when>
+			  		<c:when test="${shares.donate_percent < 2 and shares.donate_percent > 0 }">
+			  			<i class="fa fa-star-o fa-fw"></i>
+			  		</c:when>
+			  		<c:otherwise>
+			  			<i class="fa fa-ban fa-fw"></i>
+			  		</c:otherwise>
+			  	</c:choose>
+			  	</td>
+			  	<c:set var="tdAccount" value="${shares.account }"/>
+			  	<c:if test="${shares.is_anonymous == 1 and USERDATA.is_admin == 0 }">
+			  		<c:set var="tdAccount" value="anonymous"/>
+			  	</c:if>
+			  	<td>${tdAccount }</td>
+			  	<fmt:parseNumber var="shares" integerOnly="true" value="${shares.shares}"/>
+			  	<td class="text-right">${shares }</td>
+		  	</tr>
+		  </c:forEach>
+		  <c:if test="${listed != 1 and USERDATA.username ne '' && USERDATA.shares.valid > 0 }">
+		  	<c:set var="classVar" value=""/>
+		  	<c:if test="${USERDATA.username eq CONTRIBHASHES.account }">
+		  		<c:set var="listed" value="1"/>
+		  		<c:set var="classVar" value="success"/>
+		  	</c:if>
+		  	<tr class="${classVar }">
+		  		<td>n/a</td>
+		  		<td>
+		  		<c:choose>
+		  			<c:when test="${USERDATA.donate_percent >= 2 }">
+		  				<i class="fa fa-trophy fa-fw"></i>
+		  			</c:when>
+		  			<c:when test="${shares.donate_percent < 2 and shares.donate_percent > 0 }">
+		  				<i class="fa fa-star-o fa-fw"></i>
+		  			</c:when>
+		  			<c:otherwise>
+		  				<i class="fa fa-ban fa-fw"></i>
+		  			</c:otherwise>
+		  		</c:choose>
+		  		</td>
+		  		<td>${USERDATA.username }</td>
+		  		<fmt:parseNumber var="shares" integerOnly="true" value="${USERDATA.shares.valid}"/>
+		  		<td>${shares }</td>
+		  	</tr>
+		  </c:if>
           </tbody>
         </table>
       </div>

@@ -5,10 +5,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.entity.ContentType;
-import org.json.JSONObject;
+import org.apache.http.*;
+import org.apache.http.entity.*;
+import org.json.*;
 
 public class TosCoindApi extends TosCoind {
 	private static TosCoindApi instance = new TosCoindApi();
