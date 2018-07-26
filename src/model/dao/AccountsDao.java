@@ -22,18 +22,18 @@ public class AccountsDao extends Base {
 		return accountsDao;
 	}
 
-	public String getUserName(Connection conn, int id ) throws SQLException{
+	public String getUserName(Connection conn, int id) throws SQLException {
 		String resultValue = "";
 		resultValue = getSingle(conn, String.valueOf(id), "username", "id", 0, 1, false);
 		return resultValue;
 	}
-	
+
 	private String getUserEmail(Connection conn, String username) throws SQLException {
 		String resultValue = "";
 		resultValue = getSingle(conn, username, "email", "username", 1, 1, true);
 		return resultValue;
 	}
-	
+
 	private int getUserId(Connection conn, String username) throws SQLException {
 		String resultValue = "";
 		int returnValue = 0;
@@ -107,17 +107,17 @@ public class AccountsDao extends Base {
 	public int setLocked(Connection conn, int id, int value) throws SQLException {
 		return updateSingle(conn, id, "is_locked", String.valueOf(value), 0, this.table);
 	}
- 
+
 	/* filed_logins 변경 */
 	public int setUserFailed(Connection conn, int id, int value) throws SQLException {
 		return updateSingle(conn, id, "failed_logins", String.valueOf(value), 0, this.table);
 	}
-	
+
 	/* failed_pins 변경 */
 	public int setUserPinFailed(Connection conn, int id, int value) throws SQLException {
 		return updateSingle(conn, id, "failed_pins", String.valueOf(value), 0, this.table);
 	}
-	
+
 	// get is_Admin
 	public boolean isAdmin(Connection conn, int id) throws SQLException {
 		String resultValue = "";
@@ -192,7 +192,7 @@ public class AccountsDao extends Base {
 					mailVo.setContent(GlobalSettings.get("mail.ftl.locked"));
 					mailVo.setUrl(GlobalSettings.get("contextpath"));
 					mailVo.setToken(token);
-					
+
 					boolean sendCheck = Mail.sendMail(mailVo);
 					if (!sendCheck) {
 						setErrorMessage("Send Mail Failed");
@@ -311,6 +311,11 @@ public class AccountsDao extends Base {
 				return false;
 			}
 			// JSON RPC로 지갑에 등록된 주소인지 확인
+			String params = "[\"" + signUpVo.getCoinaddress() + "\"]";
+			if (TosCoindApi.getInstance().getaccount(params) == null) {
+				this.setErrorMessage("Invalid Coinaddress");
+				return false;
+			}
 			// Coin address is not valid
 		} else {
 			this.setErrorMessage("You need to insert your Coin address");
@@ -359,9 +364,9 @@ public class AccountsDao extends Base {
 				int is_locked = 1;
 				is_locked = !GlobalSettings.get("accounts_confirm_email_disabled").equals("true") ? 1 : 0;
 				is_admin = 0;
-				pstmt = conn.prepareStatement(""
-						+ "INSERT INTO Accounts (username, pass, email, signup_timestamp, pin, api_key, is_locked) "
-						+ "VALUES (?, ?, ?, ?, ?, ?, ?)");
+				pstmt = conn.prepareStatement(
+						"" + "INSERT INTO Accounts (username, pass, email, signup_timestamp, pin, api_key, is_locked) "
+								+ "VALUES (?, ?, ?, ?, ?, ?, ?)");
 				pstmt.setInt(7, is_locked);
 			} else {
 				int is_locked = 0;
@@ -376,7 +381,7 @@ public class AccountsDao extends Base {
 			String pin_hash = this.getHash(signUpVo.getPin(), 1, Converter.getRandomByte());
 			String apikey_hash = this.getHash(signUpVo.getUsername(), 0, null);
 			String username_clean = signUpVo.getUsername();
-			int signup_time = (int)(System.currentTimeMillis() / 1000);
+			int signup_time = (int) (System.currentTimeMillis() / 1000);
 			pstmt.setString(1, username_clean);
 			pstmt.setString(2, password_hash);
 			pstmt.setString(3, signUpVo.getEmail1());
@@ -388,22 +393,23 @@ public class AccountsDao extends Base {
 				this.setErrorMessage("register Failed please try later");
 				throw new SQLException("register Failed please try later");
 			} else {
-				if (signUpVo.getCoinaddress() != null)  {
+				if (signUpVo.getCoinaddress() != null) {
 					int new_account_id = this.getLastUserId(conn, signUpVo.getUsername());
-					if(new_account_id == 0) {
+					if (new_account_id == 0) {
 						this.setErrorMessage("Coin address register Failed please try later");
 						throw new SQLException("select lastestuser failed");
 					}
-					boolean success = Coin_addressesDao.getInstance().add(conn, new_account_id, signUpVo.getCoinaddress(), null);
-					if(!success) {
+					boolean success = Coin_addressesDao.getInstance().add(conn, new_account_id,
+							signUpVo.getCoinaddress(), null);
+					if (!success) {
 						this.setErrorMessage("register Failed please try later");
 						throw new SQLException("coin_address failed insert");
 					}
 				}
 				// accounts_confirm_email_disabled == true 일경우 토큰, 이메일 발송 하지 않음
 				if (GlobalSettings.get("accounts_confirm_email_disabled").equals("true")) {
-					
-				} else if(GlobalSettings.get("accounts_confirm_email_disabled").equals("false") && is_admin != 1){
+
+				} else if (GlobalSettings.get("accounts_confirm_email_disabled").equals("false") && is_admin != 1) {
 					// accounts_confirm_email_disabled == false
 					TokensDao tokensDao = TokensDao.getInstance();
 					String token = null;
@@ -458,7 +464,7 @@ public class AccountsDao extends Base {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		if(value.isEmpty()) {
+		if (value.isEmpty()) {
 			return false;
 		} else {
 			return true;
@@ -468,16 +474,15 @@ public class AccountsDao extends Base {
 	private int getFirstID(Connection conn) {
 		return 1;
 	}
-	
+
 	private int getLastUserId(Connection conn, String username) {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		int id = 0;
 		try {
-			pstmt = conn.prepareStatement(""
-					+ "Select id from accounts order by id desc limit 1");
+			pstmt = conn.prepareStatement("" + "Select id from accounts order by id desc limit 1");
 			rs = pstmt.executeQuery();
-			if(rs.next()) {
+			if (rs.next()) {
 				id = rs.getInt(1);
 			}
 		} catch (SQLException e) {
@@ -490,36 +495,36 @@ public class AccountsDao extends Base {
 		}
 		return id;
 	}
-	 
+
 	// 비밀번호 초기화 메일 전송
 	public boolean initResetPassword(Connection conn, String username) throws SQLException {
 		String name = getUserNameByEmail(conn, username);
-		if (username.trim().equals("")){
+		if (username.trim().equals("")) {
 			setErrorMessage("Username must not be empty");
 			return false;
 		}
-		if(checkEmail(username)){
-			if(name.equals("")){
+		if (checkEmail(username)) {
+			if (name.equals("")) {
 				setErrorMessage("Invalid username or password.");
 				return false;
-			}else{
+			} else {
 				username = name;
 			}
 		}
-		
-		String email = getUserEmail(conn, username); 
-		if(email.equals("")){
+
+		String email = getUserEmail(conn, username);
+		if (email.equals("")) {
 			setErrorMessage("Please check your mail account to finish your password reset");
 			return false;
 		}
-		
+
 		TokensDao tokensDao = TokensDao.getInstance();
 		String token = tokensDao.createToken(conn, "password_reset", getUserId(conn, email));
-		if(token.equals("")){
+		if (token.equals("")) {
 			setErrorMessage("Unable to setup token for password reset");
 			return false;
 		}
-		
+
 		MailVo mailVo = new MailVo();
 		mailVo.setUrl(GlobalSettings.get("contextpath"));
 		mailVo.setEmail(email);
@@ -535,66 +540,68 @@ public class AccountsDao extends Base {
 		return true;
 	}
 
-	
-	// Password Reset 
-	public boolean resetPassword(Connection conn, String token, String newPassword, String newPassword2) throws SQLException {
+	// Password Reset
+	public boolean resetPassword(Connection conn, String token, String newPassword, String newPassword2)
+			throws SQLException {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		
+
 		TokensDao tokensDao = TokensDao.getInstance();
 		TokensVo tokensVo = tokensDao.getToken(conn, token, "password_reset");
-		if(tokensVo != null){
-			if(!newPassword.equals(newPassword2)){
+		if (tokensVo != null) {
+			if (!newPassword.equals(newPassword2)) {
 				setErrorMessage("New passwords do not match");
 				return false;
 			}
-			if(newPassword.length() < 8){
+			if (newPassword.length() < 8) {
 				setErrorMessage("New password is too short, please use more than 8 chars");
 				return false;
 			}
 			String new_hash = getHash(newPassword, 1, Converter.getRandomByte());
-			try{
-				pstmt = conn.prepareStatement("UPDATE "+this.table+" set pass = ? where id = ? LIMIT 1");
+			try {
+				pstmt = conn.prepareStatement("UPDATE " + this.table + " set pass = ? where id = ? LIMIT 1");
 				pstmt.setString(1, new_hash);
 				pstmt.setInt(2, tokensVo.getAccounts_id());
-				
+
 				int updateRow = pstmt.executeUpdate();
-				if(updateRow == 1){
+				if (updateRow == 1) {
 					int deleteRow = tokensDao.deleteToken(conn, tokensVo.getToken());
-					if(deleteRow == 1){
+					if (deleteRow == 1) {
 						return true;
-					}else{
+					} else {
 						setErrorMessage("Unable to invalidate used token");
 					}
-				}else{
-					setErrorMessage("Unable to set new password or you chose the same password. Please use a different one.");
+				} else {
+					setErrorMessage(
+							"Unable to set new password or you chose the same password. Please use a different one.");
 				}
-			}finally{
+			} finally {
 				CloseUtilities.close(rs);
 				CloseUtilities.close(pstmt);
 			}
-		}else{
+		} else {
 			setErrorMessage("Invalid token: " + tokensDao.getError());
 		}
-		
-	    return false;
+
+		return false;
 	}
 
 	// 로그아웃, 세션 죽이기
 	public void logoutUser(HttpServletRequest request) {
-		
+
 		request.getSession().invalidate();
-		 
+
 	}
 
-	
-	/* 사용자 인증 및 로그인 가능여부 체크 
-	 * session 확인
-	 * 계정이 잠긴 경우 session 파괴 */
+	/*
+	 * 사용자 인증 및 로그인 가능여부 체크 session 확인 계정이 잠긴 경우 session 파괴
+	 */
 	public boolean isAuthenticated(Connection conn, boolean logout, HttpServletRequest request) throws SQLException {
 		HttpSession session = request.getSession();
-		int authenticated = session.getAttribute("AUTHENTICATED") != null ? (int) session.getAttribute("AUTHENTICATED") : 0;
-		AccountsVo userData = session.getAttribute("USERDATA") != null ? (AccountsVo) session.getAttribute("USERDATA") : null;
+		int authenticated = session.getAttribute("AUTHENTICATED") != null ? (int) session.getAttribute("AUTHENTICATED")
+				: 0;
+		AccountsVo userData = session.getAttribute("USERDATA") != null ? (AccountsVo) session.getAttribute("USERDATA")
+				: null;
 		if (authenticated == 1 && !isLocked(conn, userData.getUsername())
 				&& getUserIp(conn, userData.getId()).equals(request.getRemoteAddr())) {
 			return true;

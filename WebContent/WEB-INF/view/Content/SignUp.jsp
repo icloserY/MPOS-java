@@ -2,9 +2,9 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <script>
-  var zxcvbnPath = "{$PATH}/js/zxcvbn/zxcvbn.js";
+  var zxcvbnPath = "./Resources/site_assets/bootstrap/js/zxcvbn/zxcvbn.js";
 </script>
-<script type="text/javascript" src="{$PATH}/js/pwcheck.js"></script>
+<script type="text/javascript" src="./Resources/site_assets/bootstrap/js/pwcheck.js"></script>
 <div class="row">
   <div class="col-lg-5">
     <form class="panel panel-info" method="post" role="form">

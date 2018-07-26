@@ -6,6 +6,6 @@
 		driverClassName="com.mysql.jdbc.Driver"
 		maxActive="10"
 		username="root"
-		password="hhc369"
+		password="root"
 		url="jdbc:mysql://localhost:3306/mpos?autoReconnect=true"/>
 </Context>

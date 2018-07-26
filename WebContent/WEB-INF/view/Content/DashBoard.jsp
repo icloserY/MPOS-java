@@ -1,4 +1,3 @@
-{if $smarty.session.AUTHENTICATED|default}
 <script src="./Resources/site_assets/bootstrap/js/plugins/date.format.js"></script>
 <script src="./Resources/site_assets/bootstrap/js/plugins/soundjs-0.6.0.min.js"></script>
 
