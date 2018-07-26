@@ -14,8 +14,8 @@ public class TosCoindApi extends TosCoind {
 	public static TosCoindApi getInstance() {
 		return instance;
 	}
-	public String getaccount(String params){
-		String method = "getaccount";
+	private String call(String method, String params){
+		//method = "getaccount";
 		String id = "1";
 		String jsonrpc = "1.0";
 		String result = null;
@@ -69,8 +69,14 @@ public class TosCoindApi extends TosCoind {
 		}
 
 		System.out.println(stringresponse.toString());
-
-		JSONObject obj = new JSONObject(stringresponse.toString());
+		
+		return stringresponse.toString();
+	}
+	public String getAccount(String params) {
+		String method = "getaccount";
+		String response = call(method, params);
+		String result = null;
+		JSONObject obj = new JSONObject(response);
 		try {
 			if (obj.get("error").toString().equals("null"))
 				result = obj.getString("result");

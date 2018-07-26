@@ -312,7 +312,7 @@ public class AccountsDao extends Base {
 			}
 			// JSON RPC로 지갑에 등록된 주소인지 확인
 			String params = "[\"" + signUpVo.getCoinaddress() + "\"]";
-			if (TosCoindApi.getInstance().getaccount(params) == null) {
+			if (TosCoindApi.getInstance().getAccount(params) == null) {
 				this.setErrorMessage("Invalid Coinaddress");
 				return false;
 			}
