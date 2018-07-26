@@ -1,17 +1,15 @@
 package model;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.*;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.entity.ContentType;
-import org.json.JSONObject;
+import org.apache.http.*;
+import org.apache.http.entity.*;
+import org.json.*;
 
 public class TosCoindApi extends TosCoind {
 
 	public void getinfo() throws Throwable {
-		String entity = "{\"method\":\"getinfo\",\"id\":1,\"jsonrpc\":\"1.0\", param:[10,\"20\"]}";
+		String entity = "{\"method\":\"getinfo\",\"id\":1,\"jsonrpc\":\"1.0\", params:[10,\"20\"]}";
 		byte[] entityArray = entity.getBytes();
 		HttpResponse response = this.executeHttpRequest("post", url,
 				new ByteArrayEntity(entityArray, ContentType.APPLICATION_JSON));

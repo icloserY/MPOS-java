@@ -3,6 +3,7 @@ package model.dao;
 import java.sql.*;
 
 import jdbc.*;
+import model.*;
 import model.vo.*;
 
 public class BlocksDao extends Base {
@@ -57,6 +58,30 @@ public class BlocksDao extends Base {
 			pstmt = conn.prepareStatement("select AVG(x.shares) AS average FROM (SELECT shares FROM "+this.table+" WHERE height <= ? ORDER BY height DESC LIMIT ?) AS x");
 			pstmt.setInt(1, height);
 			pstmt.setInt(2, limit);
+			
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()){
+				returnValue = rs.getDouble(1);
+			}
+			
+		} finally {
+			CloseUtilities.close(rs);
+			CloseUtilities.close(pstmt);
+		}
+		return returnValue;
+	}
+
+	public double getAverageAmount(Connection conn, int limit) throws SQLException {
+		double returnValue = 0;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		try {
+			pstmt = conn.prepareStatement("SELECT IFNULL(AVG(amount), "+GlobalSettings.get("reward")+" ) as avg_amount FROM ( SELECT amount FROM "+this.table
+					+ " ORDER BY id DESC LIMIT ?) AS t1");
+			
+			pstmt.setInt(1, limit);
 			
 			rs = pstmt.executeQuery();
 			

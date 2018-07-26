@@ -18,10 +18,10 @@ public class StatisticsDao extends Base {
 	public static StatisticsDao getInstance() {
 		return statisticsDao;
 	}
-	public int getRoundShares(Connection conn) throws SQLException {
+	public RoundSharesVo getRoundShares(Connection conn) throws SQLException {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		int returnValue = 0;
+		RoundSharesVo returnValue = null;
 		try{
 			pstmt = conn.prepareStatement("SELECT IFNULL(SUM(IF(our_result='Y', IF(difficulty=0, POW(2, (" + GlobalSettings.get("difficulty") +"  - 16)), difficulty), 0)), 0) AS valid,"
 					+ "IFNULL(SUM(IF(our_result='N', IF(difficulty=0, POW(2, (" + GlobalSettings.get("difficulty") + " - 16)), difficulty), 0)), 0) AS invalid"
@@ -29,7 +29,9 @@ public class StatisticsDao extends Base {
 			
 			rs = pstmt.executeQuery();
 			if(rs.next()){
-				returnValue = rs.getInt(1);
+				returnValue = new RoundSharesVo();
+				returnValue.setValid(rs.getDouble(1));
+				returnValue.setInvalid(rs.getDouble(2));
 			}
 			
 		}finally{
@@ -342,7 +344,6 @@ public class StatisticsDao extends Base {
 						+ " FROM shares AS s LEFT JOIN accounts AS a ON SUBSTRING_INDEX( s.username, '.', 1 ) = a.username WHERE our_result = 'Y'"
 						+ " GROUP BY account ORDER BY shares DESC LIMIT ?");
 				pstmt.setInt(1, limit);
-				
 				rs = pstmt.executeQuery();
 				
 				while (rs.next()) {
@@ -492,6 +493,45 @@ public class StatisticsDao extends Base {
 		return coin_base.calcNetworkExpectedTimePerBlock(dDifficulty,hashrate);
 	}
 	
+	
+	public double getEstimatedShares(int dDiff) {
+		Coin_Base coin_base = new Coin_Base();
+		return coin_base.calcEstaimtedShares(dDiff);
+	}
+	
+	public double getExpectedNextDifficulty() {
+		double dDifficulty = 0;
+		double dNetworkHashrate = 0;
+		Coin_Base coin_base = new Coin_Base();
+		// bitcoin_can_connect() 처리
+		if(false){
+			/*
+			 * 변경 필요
+			 * $dDifficulty = $this->bitcoin->getdifficulty();
+      		 * $dNetworkHashrate = $this->bitcoin->getnetworkhashps();
+      		 * */
+		} else {
+			dDifficulty = 1;
+			dNetworkHashrate = 1;
+		}
+		return coin_base.calcExpectedNextDifficulty(dDifficulty,dNetworkHashrate);
+	}
+	
+	public double getBlocksUntilDiffChange() {
+		double iBlockcount = 0;
+		
+		// bitcoin_can_connect() 처리
+		if(false){
+			/*
+			 * 변경 필요
+			 * $iBlockcount = $this->bitcoin->getblockcount();
+      		 * */
+		} else {
+			iBlockcount = 1;
+		}
+		return Double.parseDouble(GlobalSettings.get("coindiffchangetarget")) - (iBlockcount % Double.parseDouble(GlobalSettings.get("coindiffchangetarget")));
+	}
+	 
 	
 	
 }

@@ -1,3 +1,5 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
   <div class="col-lg-6">
     <div class="panel panel-info">
       <div class="panel-heading">
@@ -14,26 +16,40 @@
             </tr>
           </thead>
           <tbody>
-{assign var=rank value=1}
-{section block $BLOCKSFOUND}
-            <tr>
-              {if ! $GLOBAL.website.blockexplorer.disabled}
+          <c:set var="rank" value="1"/>
+          <c:forEach var="block" items="${BLOCKSFOUND }">
+          <tr>
+          	<!-- need change 
+          	  {if ! $GLOBAL.website.blockexplorer.disabled}
               <td><a href="{$GLOBAL.website.blockexplorer.url}{$BLOCKSFOUND[block].blockhash}" target="_new">{$BLOCKSFOUND[block].height}</a></td>
               {else}
               <td>{$BLOCKSFOUND[block].height}</td>
-              {/if}
-              <td>{if $BLOCKSFOUND[block].is_anonymous|default:"0" == 1 && $GLOBAL.userdata.is_admin|default:"0" == 0}anonymous{else}{$BLOCKSFOUND[block].finder|default:"unknown"|escape}{/if}</td>
-              <td>{$BLOCKSFOUND[block].time|date_format:$GLOBAL.config.date}</td>
-              <td class="text-right">{$BLOCKSFOUND[block].shares|number_format:$GLOBAL.config.sharediffprecision}</td>
-            </tr>
-{/section}
+              {/if} 
+              -->
+              <td>${block.height }</td>
+              <c:set var="tdVar" value="unknown"/>
+              <c:if test="${block.finder != null and block.finder ne '' }">
+              	<c:set var="tdVar" value="${block.finder }"/>
+              </c:if>
+              <c:if test="${block.is_anonymous == 1 and USERDATA.is_admin == 0}">
+              	<c:set var="tdVar" value="anonymous"/>
+              </c:if>
+              <td>${tdVar }</td>
+              <!-- need change
+				<td>{$BLOCKSFOUND[block].time|date_format:$GLOBAL.config.date}</td>
+			   -->
+			  <td>${block.time }</td>
+			  <fmt:parseNumber var="shares" integerOnly="true" value="${block.shares}"/>
+			  <td class="text-right">${shares }</td>
+          </tr>
+          </c:forEach>
           </tbody>
         </table>
       </div>
-{if $GLOBAL.config.payout_system != 'pps'}
-      <div class="panel-footer">
-          <h6>Note: Round Earnings are not credited until <font class="confirmations">{$GLOBAL.confirmations}</font> confirms.</h6>
-      </div>
-{/if}
+      <c:if test="${payout_system ne 'pps' }">
+      	<div class="panel-footer">
+          <h6>Note: Round Earnings are not credited until <font class="confirmations">${confirmations}</font> confirms.</h6>
+      	</div>
+      </c:if>
     </div>
   </div>
