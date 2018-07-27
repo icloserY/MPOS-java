@@ -85,4 +85,43 @@ public class TosCoindApi extends TosCoind {
 		}
 		return result;
 	}
+	public String getnetworkhashps(String params) {
+		String method = "getmininginfo";
+		String response = call(method, params);
+		String result = new String();
+		JSONObject obj = new JSONObject(response);
+		try {
+			if (obj.get("error").toString().equals("null"))
+				result = obj.getString("result");
+		} catch(NullPointerException | NumberFormatException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	public int getBlockCount(String params) {
+		String method = "getblockcount";
+		String response = call(method, params);
+		int result = 0;
+		JSONObject obj = new JSONObject(response);
+		try {
+			if (obj.get("error").toString().equals("null"))
+				result = obj.getInt("result");
+		} catch(NullPointerException | NumberFormatException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	public Double getDifficulty(String params) {
+		String method = "getdifficulty";
+		String response = call(method, params);
+		Double result = 0.0;
+		JSONObject obj = new JSONObject(response);
+		try {
+			if (obj.get("error").toString().equals("null"))
+				result = obj.getDouble("result");
+		} catch(NullPointerException | NumberFormatException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
 }

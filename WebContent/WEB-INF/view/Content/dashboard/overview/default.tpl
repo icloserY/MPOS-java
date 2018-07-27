@@ -7,7 +7,12 @@
       </div>
       <div class="panel-footer">
        <div class="row">
-       <jsp:include page="/WEB-INF/view/Content/dashboard/overview/_without_price_graph.jsp" flush="false" />
+          {* Depending on the price option we need to load a different template so it aligns properly *}
+          {if $GLOBAL.config.price.enabled}
+          {include file="dashboard/overview/_with_price_graph.tpl"}
+          {else}
+          {include file="dashboard/overview/_without_price_graph.tpl"}
+          {/if}
        </div>
       </div>
     </div>

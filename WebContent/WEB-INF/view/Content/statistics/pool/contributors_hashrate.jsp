@@ -60,42 +60,7 @@
               	-->
 		  	</tr>
           </c:forEach>
-          <c:if test="${listed != 1 and USERDATA.usernam != null and USERDATA.rawhashrate > 0}">
-          	<pf:roundVar var="myestday" diff="${DIFFICULTY }" reward="${REWARD }" hashrate="${USERDATA.rawhashrate }"/>
-          	<c:set var="classVar" value=""/>
-		  	<c:if test="${USERDATA.username eq contrib.account }">
-		  		<c:set var="listed" value="1"/>
-		  		<c:set var="classVar" value="success"/>
-		  	</c:if>
-		  	<tr class="${classVar }">
-		  		<td>n/a</td>
-		  		<td>
-			  	<c:choose>
-			  		<c:when test="${USERDATA.donate_percent >= 2}">
-			  			<i class="fa fa-trophy fa-fw"></i>
-			  		</c:when>
-			  		<c:when test="${USERDATA.donate_percent < 2 and USERDATA.donate_percent > 0 }">
-			  			<i class="fa fa-star-o fa-fw"></i>
-			  		</c:when>
-			  		<c:otherwise>
-			  			<i class="fa fa-ban fa-fw"></i>
-			  		</c:otherwise>
-			  	</c:choose>
-			  	</td>
-			  	<td>${USERDATA.username }</td>
-			  	<fmt:parseNumber var="rawhashrate" integerOnly="true" value="${USERDATArawhashrate}"/>
-			  	<td class="text-right">${rawhashrate }</td>
-			  	<c:set var="tdMyestday" value="n/a"/>
-			  	<c:if test="${myestday != null }">
-			  		<c:set var="tdMyestday" value="${myestday }"/>
-			  	</c:if>
-			  	<td class="text-right">${tdMyestday }</td>
-			  	<!-- {if $GLOBAL.config.price.enabled}
-              		 {if $GLOBAL.config.price.currency}<td class="text-right">{($myestday * $GLOBAL.price)|default:"n/a"|number_format:"4"}</td>{/if}
-              		 {/if} 
-                -->
-		  	</tr>
-          </c:if>
+          
           </tbody>
         </table>
       </div>

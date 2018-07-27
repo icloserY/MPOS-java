@@ -204,4 +204,27 @@ public class Pool_workerDao extends Base {
 		
 		return workers;
 	}
+	
+	public int getCountAllActiveWorkers(Connection conn, int interval) {
+		if(interval < 0) {
+			interval = 120;
+		}
+	    PreparedStatement pstmt = null;
+	    ResultSet rs = null;
+	    int result = 0;
+	    try {
+	    	pstmt = conn.prepareStatement(""
+	    		+ "SELECT COUNT(DISTINCT(username)) AS total "
+	    		+ "FROM shares "
+	    		+ "WHERE our_result = 'Y' "
+	    		+ "AND time > DATE_SUB(now(), INTERVAL ? SECOND)");
+	    	pstmt.setInt(1, interval);
+	    	rs = pstmt.executeQuery();
+	    	rs.next();
+	    	result = rs.getInt(1);
+	    }catch (Exception e) {
+	    	e.printStackTrace();
+	    }
+	    return result;
+	  }
 }

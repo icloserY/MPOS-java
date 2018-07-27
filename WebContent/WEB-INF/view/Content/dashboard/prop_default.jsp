@@ -6,8 +6,7 @@
 				<i class="fa fa-spinner fa-fw"></i> Round Information
 			</h4>
 		</div>
-		{assign var=PAYOUT_SYSTEM value=$GLOBAL.config.payout_system} {include
-		file="dashboard/round_statistics/$PAYOUT_SYSTEM/round.tpl"}
+       <jsp:include page="/WEB-INF/view/Content/dashboard/round_statistics/prop/round.jsp" flush="false" />
 	</div>
 </div>
 <div class="col-lg-4">
@@ -17,7 +16,6 @@
 				<i class="fa fa-cloud fa-fw"></i> Share Information
 			</h4>
 		</div>
-		{assign var=PAYOUT_SYSTEM value=$GLOBAL.config.payout_system} {include
-		file="dashboard/round_statistics/$PAYOUT_SYSTEM/shares.tpl"}
+       <jsp:include page="/WEB-INF/view/Content/dashboard/round_statistics/prop/shares.jsp" flush="false" />
 	</div>
 </div>

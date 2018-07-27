@@ -1,4 +1,4 @@
-{if !$DISABLED_DASHBOARD and !$DISABLED_DASHBOARD_API}
+<!-- {if !$DISABLED_DASHBOARD and !$DISABLED_DASHBOARD_API} -->
   <div class="col-lg-12">
     <div class="panel panel-info">
       <div class="panel-heading">
@@ -19,31 +19,31 @@
           </tr>
           </thead>
           <tbody id="b-blocks">
-{section block $BLOCKSFOUND}
+<!-- {section block $BLOCKSFOUND} -->
             <tr>
-              <td class="text-right">{$BLOCKSFOUND[block].height}</td>
-              <td>{if $BLOCKSFOUND[block].is_anonymous|default:"0" == 1 && $GLOBAL.userdata.is_admin|default:"0" == 0}anonymous{else}{$BLOCKSFOUND[block].finder|default:"unknown"|escape}{/if}</td>
-              <td class="text-right">{$BLOCKSFOUND[block].time|date_format:$GLOBAL.config.date}</td>
-              <td class="text-right">{$BLOCKSFOUND[block].difficulty|number_format:"4"}</td>
-              <td class="text-right">{$BLOCKSFOUND[block].amount|number_format:"2"}</td>
-              <td class="text-right">{$BLOCKSFOUND[block].estshares|number_format:$GLOBAL.config.sharediffprecision}</td>
-              <td class="text-right">{$BLOCKSFOUND[block].shares|number_format:$GLOBAL.config.sharediffprecision}</td>
+              <td class="text-right"><!-- {$BLOCKSFOUND[block].height} --></td>
+              <td><!-- {if $BLOCKSFOUND[block].is_anonymous|default:"0" == 1 && $GLOBAL.userdata.is_admin|default:"0" == 0}anonymous{else}{$BLOCKSFOUND[block].finder|default:"unknown"|escape}{/if} --></td>
+              <td class="text-right"><!-- {$BLOCKSFOUND[block].time|date_format:$GLOBAL.config.date} --></td>
+              <td class="text-right"><!-- {$BLOCKSFOUND[block].difficulty|number_format:"4"} --></td>
+              <td class="text-right"><!-- {$BLOCKSFOUND[block].amount|number_format:"2"} --></td>
+              <td class="text-right"><!-- {$BLOCKSFOUND[block].estshares|number_format:$GLOBAL.config.sharediffprecision} --></td>
+              <td class="text-right"><!-- {$BLOCKSFOUND[block].shares|number_format:$GLOBAL.config.sharediffprecision} --></td>
               <td class="text-right">
-                {math assign="percentage" equation="shares / estshares * 100" shares=$BLOCKSFOUND[block].shares|default:"0" estshares=$BLOCKSFOUND[block].estshares}
-                <font color="{if ($percentage <= 100)}green{else}red{/if}">{$percentage|number_format:"2"}</font>
+                <!-- {math assign="percentage" equation="shares / estshares * 100" shares=$BLOCKSFOUND[block].shares|default:"0" estshares=$BLOCKSFOUND[block].estshares} -->
+                <font color="{if ($percentage <= 100)}green{else}red{/if}"><!-- {$percentage|number_format:"2"} --></font>
               </td>
             </tr>
-{/section}
+<!-- {/section} -->
           </tbody>
         </table>
       </div>
-      {if $GLOBAL.website.blockfindersound.enabled|default:"1"}
+      <!-- {if $GLOBAL.website.blockfindersound.enabled|default:"1"} -->
       <div id="togglesound" class="togglesound">
         <div class="panel-footer text-right">
           <button id="muteButton" type="button" class="btn-xs btn-success toggleSoundButton"><i class="fa fa-volume-up"></i></button>
         </div>
       </div>
-      {/if}
+      <!-- {/if} -->
     </div>
   </div>
-{/if}
+<!-- {/if} -->

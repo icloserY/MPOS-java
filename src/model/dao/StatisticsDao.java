@@ -439,6 +439,9 @@ public class StatisticsDao extends Base {
 		return returnValue;
 	}
 	public double getCurrentHashrate(Connection conn, int interval) throws SQLException {
+		if(interval < 0) {
+			interval = 180;
+		}
 		double returnValue = 0;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -532,7 +535,46 @@ public class StatisticsDao extends Base {
 		return Double.parseDouble(GlobalSettings.get("coindiffchangetarget")) - (iBlockcount % Double.parseDouble(GlobalSettings.get("coindiffchangetarget")));
 	}
 	 
-	
+	public Map<String, Object> getUserMiningStats(Connection conn, String username, int id, int interval) {
+		if(interval < 0) {
+			interval = 180;
+		}
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		Map<String, Object> result = new HashMap<>();
+		try {
+			pstmt = conn.prepareStatement(""
+					+ "SELECT "
+					+ "IFNULL(SUM(difficulty) / ?, 0) AS sharerate, "
+					+ "IFNULL(SUM(difficulty), 0) AS shares, "
+					+ "IFNULL(AVG(difficulty), 0) AS avgsharediff "
+					+ "FROM (SELECT id, our_result, IF(difficulty = 0, POW(2, ("+ GlobalSettings.get("difficulty") +" - 16)), difficulty) AS difficulty "
+					+ "FROM shares "
+					+ "WHERE username LIKE ? AND time > DATE_SUB(now(), INTERVAL ? SECOND) "
+					+ "AND our_result = 'Y' UNION SELECT share_id, our_result, IF(difficulty = 0, POW(2, ("+ GlobalSettings.get("difficulty") +" - 16)), difficulty) AS difficulty "
+					+ "FROM shares_archive "
+					+ "WHERE username LIKE ? AND time > DATE_SUB(now(), INTERVAL ? SECOND) AND our_result = 'Y') AS temp");
+			pstmt.setInt(1, interval);
+			pstmt.setString(2, username);
+			pstmt.setInt(3, interval);
+			pstmt.setString(4, username);
+			pstmt.setInt(5, interval);
+			rs = pstmt.executeQuery();
+			rs.next();
+			result.put("sharerate", rs.getDouble(1));
+			result.put("shares", rs.getDouble(2));
+			result.put("avgsharediff", rs.getDouble(3));
+			Coin_Base coin_Base = new Coin_Base();
+			result.put("hashrate", coin_Base.calcHashrate((Double)result.get("shares"), interval));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			CloseUtilities.close(pstmt);
+			CloseUtilities.close(rs);
+		}
+		
+		return result;
+	}
 	
 }
  

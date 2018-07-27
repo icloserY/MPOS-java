@@ -1,4 +1,4 @@
-{if !$DISABLED_DASHBOARD and !$DISABLED_DASHBOARD_API}
+<!-- {if !$DISABLED_DASHBOARD and !$DISABLED_DASHBOARD_API} -->
   <div class="col-lg-4">
     <div class="panel panel-info">
       <div class="panel-heading">
@@ -20,4 +20,4 @@
       </div>
     </div>
   </div>
-{/if}
+<!-- {/if} -->

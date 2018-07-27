@@ -1,18 +1,22 @@
 package controller;
 
 import java.io.*;
+import java.sql.Connection;
 import java.util.*;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
 
 import command.handler.*;
+import jdbc.JDBCConnection;
 import model.*;
+import model.dao.SettingsDao;
+import model.dao.StatisticsDao;
 
 public class DispatcherServlet extends HttpServlet {
 	private Map<String, ComHanInterFace> commandHandlerMap = new HashMap<>();
 	private Map<String, String> globalSettings = GlobalSettings.getInstance();
-	
+
 	public void init() throws ServletException {
 		String configFile = getInitParameter("configFile");
 		Properties prop = new Properties();
@@ -23,15 +27,14 @@ public class DispatcherServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 		Iterator<Object> keyIter = prop.keySet().iterator();
-		while(keyIter.hasNext()) {
-			String command = (String)keyIter.next();
+		while (keyIter.hasNext()) {
+			String command = (String) keyIter.next();
 			String handlerClassName = prop.getProperty(command);
 			try {
 				Class<?> handlerClass = Class.forName(handlerClassName);
-				ComHanInterFace handlerInstance =
-						(ComHanInterFace)handlerClass.newInstance();
+				ComHanInterFace handlerInstance = (ComHanInterFace) handlerClass.newInstance();
 				commandHandlerMap.put(command, handlerInstance);
-			} catch (ClassNotFoundException|InstantiationException|IllegalAccessException e) {
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
 				e.printStackTrace();
 			}
 		}
@@ -44,42 +47,44 @@ public class DispatcherServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 		keyIter = prop.keySet().iterator();
-		while(keyIter.hasNext()) {
-			String key = (String)keyIter.next();
+		while (keyIter.hasNext()) {
+			String key = (String) keyIter.next();
 			String value = prop.getProperty(key);
 			globalSettings.put(key, value);
 		}
 		globalSettings.replace("mail.contextpath", getServletContext().getRealPath("/WEB-INF/view/mail"));
+		
 	}
-	
+
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		process(request, response);
 	}
-	
+
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		process(request, response);
-	}	
-	
-	private void process(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	}
+
+	private void process(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		String url = "http://" + request.getLocalAddr() + ":" + request.getLocalPort() + request.getContextPath();
-		if(!globalSettings.get("contextpath").equals(url)) {
+		if (!globalSettings.get("contextpath").equals(url)) {
 			globalSettings.replace("contextpath", url);
 		}
 		String command = request.getRequestURI();
-		if(command.indexOf(request.getContextPath()) == 0) {
+		if (command.indexOf(request.getContextPath()) == 0) {
 			command = command.substring(request.getContextPath().length());
 		}
 		ComHanInterFace handler = commandHandlerMap.get(command);
-		if(handler == null) {
+		if (handler == null) {
 			handler = new NullComHan();
 		}
 		String Content = null;
 		Content = handler.process(request, response);
-		if(Content != null && Content.endsWith(".do")){
+		if (Content != null && Content.endsWith(".do")) {
 			RequestDispatcher dispatcher = request.getRequestDispatcher(Content);
 			dispatcher.forward(request, response);
-			
-		}else{
+
+		} else {
 			String activeSide = getSide(command);
 			request.setAttribute("Content", Content);
 			request.setAttribute(activeSide, true);
@@ -88,24 +93,29 @@ public class DispatcherServlet extends HttpServlet {
 			dispatcher.forward(request, response);
 		}
 	}
+
 	private String getSide(String command) {
 		String activeSide = null;
-		
-		if(command.equals("/EditAccount.do") || command.equals("/MyWorkers.do") || command.equals("/Transactions.do") || command.equals("/Earnings.do") || command.equals("/Notifications.do")
-				|| command.equals("/Invitaions.do") || command.equals("/QRcodes.do")){
+
+		if (command.equals("/EditAccount.do") || command.equals("/MyWorkers.do") || command.equals("/Transactions.do")
+				|| command.equals("/Earnings.do") || command.equals("/Notifications.do")
+				|| command.equals("/Invitaions.do") || command.equals("/QRcodes.do")) {
 			activeSide = "Account";
-		}else if(command.equals("")){
-			
-		}else if(command.equals("/Pool.do") || command.equals("/Blocks.do") || command.equals("/Round.do") || command.equals("/Blockfinder.do") || command.equals("/Uptime.do") || command.equals("/Graphs.do") || command.equals("/Donors.do") ){
+		} else if (command.equals("")) {
+
+		} else if (command.equals("/Pool.do") || command.equals("/Blocks.do") || command.equals("/Round.do")
+				|| command.equals("/Blockfinder.do") || command.equals("/Uptime.do") || command.equals("/Graphs.do")
+				|| command.equals("/Donors.do")) {
 			activeSide = "Statistics";
-		}else if(command.equals("/Gettingstarted.do") || command.equals("/About.do")){
+		} else if (command.equals("/Gettingstarted.do") || command.equals("/About.do")) {
 			activeSide = "Help";
-		}else if(command.equals("/Logout.do") || command.equals("/Contactform.do") || command.equals("/Tac.do") || command.equals("/Login.do") || command.equals("/SignUp.do")){
+		} else if (command.equals("/Logout.do") || command.equals("/Contactform.do") || command.equals("/Tac.do")
+				|| command.equals("/Login.do") || command.equals("/SignUp.do")) {
 			activeSide = "Other";
-		}else{
+		} else {
 			activeSide = "";
 		}
-		
+
 		return activeSide;
 	}
 }
