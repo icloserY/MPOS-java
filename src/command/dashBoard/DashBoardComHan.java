@@ -12,6 +12,7 @@ import jdbc.*;
 import model.TosCoindApi;
 import model.dao.*;
 import model.vo.AccountsVo;
+import model.vo.pool.RoundSharesVo;
 
 public class DashBoardComHan implements ComHanInterFace {
 
@@ -65,7 +66,11 @@ public class DashBoardComHan implements ComHanInterFace {
 				Double dExpectedTimePerBlock = 0.0;
 				Double dEstNextDifficulty = 0.0;
 				Double iBlocksUntilDiffChange = 0.0;
+				Double iEstShares = 0.0;
+				Double dEstPercent = 0.0;
+				RoundSharesVo aRoundShares = null;
 				try {
+					aRoundShares = StatisticsDao.getInstance().getRoundShares(conn);
 					String dNetworkHashrateValue = TosCoindApi.getInstance().getnetworkhashps(null);
 					dNetworkHashrate = Double.parseDouble(dNetworkHashrateValue.isEmpty() ? "0.0": dNetworkHashrateValue);
 					iCurrentPoolHashrate = StatisticsDao.getInstance().getCurrentHashrate(conn, 180);
@@ -86,6 +91,12 @@ public class DashBoardComHan implements ComHanInterFace {
 					dExpectedTimePerBlock = StatisticsDao.getInstance().getExpectedTimePerBlock(conn, "pool", iCurrentPoolHashrate);
 					dEstNextDifficulty = StatisticsDao.getInstance().getExpectedNextDifficulty();
 					iBlocksUntilDiffChange = StatisticsDao.getInstance().getBlocksUntilDiffChange();
+					iEstShares = StatisticsDao.getInstance().getEstimatedShares(difficulty);
+					if (iEstShares > 0 && aRoundShares != null && aRoundShares.getValid() > 0) {
+					    dEstPercent = (double)Math.round(100 / iEstShares * aRoundShares.getValid());
+					  } else {
+					    dEstPercent = 0.0;
+					  }
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -108,6 +119,11 @@ public class DashBoardComHan implements ComHanInterFace {
 				NETWORK.put("EstTimePerBlock", dExpectedTimePerBlock);
 				NETWORK.put("BlocksUntilDiffChange", iBlocksUntilDiffChange);
 				request.setAttribute("NETWORK", NETWORK);
+				Map<String, Object> ESTIMATES = new HashMap<>();
+				ESTIMATES.put("shares", iEstShares);
+				ESTIMATES.put("percent", dEstPercent);
+				request.setAttribute("ESTIMATES", ESTIMATES);
+				//StatisticsDao.getInstance().getUser
 				System.out.println(request.getAttribute("user_hashrate"));
 			} catch (NamingException | SQLException e) {
 				e.printStackTrace();
