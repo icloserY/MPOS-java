@@ -124,7 +124,6 @@ public class DashBoardComHan implements ComHanInterFace {
 				ESTIMATES.put("percent", dEstPercent);
 				request.setAttribute("ESTIMATES", ESTIMATES);
 				//StatisticsDao.getInstance().getUser
-				System.out.println(request.getAttribute("user_hashrate"));
 			} catch (NamingException | SQLException e) {
 				e.printStackTrace();
 			} finally {
