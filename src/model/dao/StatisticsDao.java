@@ -41,16 +41,6 @@ public class StatisticsDao extends Base {
 		
 		
 		return returnValue;
-		/*
-		    $stmt = $this->mysqli->prepare("
-		      SELECT
-		        IFNULL(SUM(IF(our_result='Y', IF(difficulty=0, POW(2, (" . $this->config['difficulty'] . " - 16)), difficulty), 0)), 0) AS valid,
-		        IFNULL(SUM(IF(our_result='N', IF(difficulty=0, POW(2, (" . $this->config['difficulty'] . " - 16)), difficulty), 0)), 0) AS invalid
-		      FROM " . $this->share->getTableName() . "
-		      WHERE UNIX_TIMESTAMP(time) > IFNULL((SELECT MAX(time) FROM " . $this->block->getTableName() . "), 0)");
-		    if ( $this->checkStmt($stmt) && $stmt->execute() && $result = $stmt->get_result() )
-		      return $this->memcache->setCache(STATISTICS_ROUND_SHARES, $result->fetch_assoc());
-		    return $this->sqlError();*/
 		   
 	}
 	
@@ -472,17 +462,14 @@ public class StatisticsDao extends Base {
 	public double getExpectedTimePerBlock(Connection conn, String type, double hashrate) {
 		double dDifficulty = 0;
 		Coin_Base coin_base = new Coin_Base();
-		// bitcoin_can_connect() 처리
-		if(false){
-			/*
-			 * 변경 필요
-			 * if ($type == 'network') {
-		        $hashrate = $this->bitcoin->getnetworkhashps();
-		      } else {
-		        // We need hashes/second and expect khash as input
-		        $hashrate = $hashrate * 1000;
-		      }
-		      $dDifficulty = $this->bitcoin->getdifficulty();*/
+		
+		if(TosCoindApi.getInstance().can_connect().equals("true")){
+			if(type.equals("network")){
+				hashrate = TosCoindApi.getInstance().getNetworkHashps();
+			} else {
+				hashrate = hashrate * 1000;
+			}
+			dDifficulty = TosCoindApi.getInstance().getDifficulty();
 		} else {
 			hashrate = 1;
 			dDifficulty = 1;
@@ -494,7 +481,7 @@ public class StatisticsDao extends Base {
 	}
 	
 	
-	public double getEstimatedShares(int dDiff) {
+	public double getEstimatedShares(double dDiff) {
 		Coin_Base coin_base = new Coin_Base();
 		return coin_base.calcEstaimtedShares(dDiff);
 	}
@@ -503,13 +490,10 @@ public class StatisticsDao extends Base {
 		double dDifficulty = 0;
 		double dNetworkHashrate = 0;
 		Coin_Base coin_base = new Coin_Base();
-		// bitcoin_can_connect() 처리
-		if(false){
-			/*
-			 * 변경 필요
-			 * $dDifficulty = $this->bitcoin->getdifficulty();
-      		 * $dNetworkHashrate = $this->bitcoin->getnetworkhashps();
-      		 * */
+		
+		if(TosCoindApi.getInstance().can_connect().equals("true")){
+			dDifficulty = TosCoindApi.getInstance().getDifficulty();
+			dNetworkHashrate = TosCoindApi.getInstance().getNetworkHashps();
 		} else {
 			dDifficulty = 1;
 			dNetworkHashrate = 1;
@@ -520,12 +504,9 @@ public class StatisticsDao extends Base {
 	public double getBlocksUntilDiffChange() {
 		double iBlockcount = 0;
 		
-		// bitcoin_can_connect() 처리
-		if(false){
-			/*
-			 * 변경 필요
-			 * $iBlockcount = $this->bitcoin->getblockcount();
-      		 * */
+
+		if(TosCoindApi.getInstance().can_connect().equals("true")){
+			iBlockcount = TosCoindApi.getInstance().getBlockCount();
 		} else {
 			iBlockcount = 1;
 		}

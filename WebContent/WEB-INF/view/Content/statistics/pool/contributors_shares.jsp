@@ -49,7 +49,7 @@
 			  	<td class="text-right">${shares }</td>
 		  	</tr>
 		  </c:forEach>
-		  <c:if test="${listed != 1 and USERDATA.username ne '' && USERDATA.shares.valid > 0 }">
+		  <%-- <c:if test="${listed != 1 and USERDATA.username ne '' && USERDATA.shares.valid > 0 }">
 		  	<c:set var="classVar" value=""/>
 		  	<c:if test="${USERDATA.username eq CONTRIBHASHES.account }">
 		  		<c:set var="listed" value="1"/>
@@ -62,7 +62,7 @@
 		  			<c:when test="${USERDATA.donate_percent >= 2 }">
 		  				<i class="fa fa-trophy fa-fw"></i>
 		  			</c:when>
-		  			<c:when test="${shares.donate_percent < 2 and shares.donate_percent > 0 }">
+		  			<c:when test="${USERDATA.donate_percent < 2 and USERDATA.donate_percent > 0 }">
 		  				<i class="fa fa-star-o fa-fw"></i>
 		  			</c:when>
 		  			<c:otherwise>
@@ -74,7 +74,7 @@
 		  		<fmt:parseNumber var="shares" integerOnly="true" value="${USERDATA.shares.valid}"/>
 		  		<td>${shares }</td>
 		  	</tr>
-		  </c:if>
+		  </c:if> --%>
           </tbody>
         </table>
       </div>

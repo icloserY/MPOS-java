@@ -67,6 +67,7 @@ public class TokensDao extends Base {
 				tokensVo.setId(rs.getInt(1));
 				tokensVo.setAccounts_id(rs.getInt(2));
 				tokensVo.setToken(rs.getString(3));
+				
 			}else{
 				setErrorMessage(strToken);
 			}

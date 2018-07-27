@@ -10,12 +10,12 @@
                     <span class="icon-bar"></span>
                 </button>
                 <ul class="nav navbar-nav navbar-top-links">
-                  <li class="dropdown">
+                  <!-- <li class="dropdown">
                     <a href="#" class="navbar-brand dropdown-toggle" data-toggle="dropdown"><b class="caret"></b></a>
                     <ul class="dropdown-menu">
                       <li class="h4"><a href="{$PoolURL[1]}"><i class="fa fa-angle-double-right fa-fw"></i> </a></li>
                     </ul>
-                  </li>
+                  </li> -->
                 </ul> 
             </div>
 

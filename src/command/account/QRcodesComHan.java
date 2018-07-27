@@ -1,4 +1,4 @@
-package command.statistics;
+package command.account;
 
 import java.sql.*;
 import java.util.*;
@@ -11,7 +11,7 @@ import jdbc.*;
 import model.*;
 import model.dao.*;
 
-public class GraphsComHan implements ComHanInterFace {
+public class QRcodesComHan implements ComHanInterFace{
 
 	@Override
 	public String process(HttpServletRequest request, HttpServletResponse response) {
@@ -22,45 +22,23 @@ public class GraphsComHan implements ComHanInterFace {
 				: (ArrayList<Map<String, String>>) request.getAttribute("Errors");
 
 		Map<String, String> popup = new HashMap<>();
-		
-		
-		SettingsDao settingsDao = SettingsDao.getInstance();
+
 		AccountsDao accountsDao = AccountsDao.getInstance();
-		StatisticsDao statisticsDao = StatisticsDao.getInstance();
-		
+		SettingsDao settingsDao = SettingsDao.getInstance();
 		Connection conn = null;
 		try {
 			conn = JDBCConnection.getConnection();
-			/*
-			 * 변경 필요
-			if ($user->isAuthenticated()) {
-			    $aHourlyMiningStats = $statistics->getHourlyMiningStatsByAccount($_SESSION['USERDATA']['id'], 'json', 
-			    																 $setting->getValue('statistics_graphing_days', 1));
-			  }
-			  $smarty->assign('YOURMININGSTATS', @$aHourlyMiningStats);*/
-			
-			
-			if(accountsDao.isAuthenticated(conn, true, request)){
-				
-			}
-			
-			switch(settingsDao.getValue(conn, "acl_graphs_statistics")){
+			switch(settingsDao.getValue(conn, "acl_qrcode")){
 			case "0":
-			case "":
 				if(accountsDao.isAuthenticated(conn, true, request)){
-					Content = "/WEB-INF/view/Content/statistics/graphs/Graphs.jsp";
-				}else{
-					Content = "Login.do";
+					Content = "/WEB-INF/view/Content/account/Myworkers.jsp";
 				}
 				break;
 			case "1":
-				Content = "/WEB-INF/view/Content/statistics/graphs/Graphs.jsp";
-				break;
-			case "2":
 				popup = Popup.getPopup("Page currently disabled. Please try again later.", "alert alert-danger", null, null);
 				popups.add(popup);
+				break;
 			}
-			
 			
 		} catch (NamingException | SQLException e) {
 			e.printStackTrace();
@@ -72,5 +50,3 @@ public class GraphsComHan implements ComHanInterFace {
 	}
 
 }
-
-

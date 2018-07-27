@@ -60,7 +60,7 @@
               	-->
 		  	</tr>
           </c:forEach>
-          <c:if test="${listed != 1 and USERDATA.usernam != null and USERDATA.rawhashrate > 0}">
+          <%-- <c:if test="${listed != 1 and USERDATA.username != null and USERDATA.rawhashrate > 0}">
           	<pf:roundVar var="myestday" diff="${DIFFICULTY }" reward="${REWARD }" hashrate="${USERDATA.rawhashrate }"/>
           	<c:set var="classVar" value=""/>
 		  	<c:if test="${USERDATA.username eq contrib.account }">
@@ -95,7 +95,7 @@
               		 {/if} 
                 -->
 		  	</tr>
-          </c:if>
+          </c:if> --%>
           </tbody>
         </table>
       </div>

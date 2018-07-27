@@ -15,7 +15,7 @@
                     </li>
 					<%-- account가 현재 활성화 page일때 
 					    <li class="${getPage eq "account" ? "active" : "" }"> --%>
-					<li class="${ MyAccounts ? 'active' : '' }">
+					<li class="${ Account ? 'active' : '' }">
                         <a href="#"><i class="fa fa-user-md fa-fw"></i> My Account<span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
                           <li><a href="{$smarty.server.SCRIPT_NAME}?page=account&action=edit"><i class="fa fa-edit fa-fw"></i> Edit Account</a></li>
@@ -23,8 +23,8 @@
                           <li><a href="{$smarty.server.SCRIPT_NAME}?page=account&action=transactions"><i class="fa fa-credit-card fa-fw"></i> Transactions</a></li>
                           <li><a href="{$smarty.server.SCRIPT_NAME}?page=account&action=earnings"><i class="fa fa-money fa-fw"></i> Earnings</a></li>
                           <li><a href="{$smarty.server.SCRIPT_NAME}?page=account&action=notifications"><i class="fa fa-bullhorn fa-fw"></i> Notifications</a></li>
-                          <li><a href="{$smarty.server.SCRIPT_NAME}?page=account&action=invitations"><i class="fa fa-users fa-fw"></i> Invitations</a></li>
-                          <li><a href="{$smarty.server.SCRIPT_NAME}?page=account&action=qrcode"><i class="fa fa-qrcode fa-fw"></i> QR Codes</a></li>
+                          <li><a href="Invitations.do"><i class="fa fa-users fa-fw"></i> Invitations</a></li>
+                          <li><a href="QRcodes.do"><i class="fa fa-qrcode fa-fw"></i> QR Codes</a></li>
                         </ul>
                         <!-- /.nav-second-level -->
                     </li>

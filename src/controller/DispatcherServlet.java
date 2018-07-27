@@ -91,8 +91,8 @@ public class DispatcherServlet extends HttpServlet {
 	private String getSide(String command) {
 		String activeSide = null;
 		
-		if(command.equals("/EditAccount.do") || command.equals("/MyWorkers.do") || command.equals("/Transactions.do") || command.equals("/Earnings.do") || command.equals("/Notifications.do")
-				|| command.equals("/Invitaions.do") || command.equals("/QRcodes.do")){
+		if(command.equals("/EditAccount.do") || command.equals("/Myworkers.do") || command.equals("/Transactions.do") || command.equals("/Earnings.do") || command.equals("/Notifications.do")
+				|| command.equals("/Invitations.do") || command.equals("/QRcodes.do")){
 			activeSide = "Account";
 		}else if(command.equals("")){
 			
