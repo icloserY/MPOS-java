@@ -1,9 +1,6 @@
 package model;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 
 import org.apache.http.*;
 import org.apache.http.entity.*;
@@ -32,7 +29,6 @@ public class TosCoindApi extends TosCoind {
 		HttpResponse response = this.executeHttpRequest("post", url,
 				new ByteArrayEntity(entityArray, ContentType.APPLICATION_JSON));
 
-		System.out.println(response);
 		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF8"));
@@ -68,10 +64,10 @@ public class TosCoindApi extends TosCoind {
 			e1.printStackTrace();
 		}
 
-		System.out.println(stringresponse.toString());
 		
 		return stringresponse.toString();
 	}
+	
 	public String getAccount(String params) {
 		String method = "getaccount";
 		String response = call(method, params);
@@ -85,6 +81,7 @@ public class TosCoindApi extends TosCoind {
 		}
 		return result;
 	}
+	
 	public String getnetworkhashps(String params) {
 		String method = "getmininginfo";
 		String response = call(method, params);
@@ -98,9 +95,43 @@ public class TosCoindApi extends TosCoind {
 		}
 		return result;
 	}
-	public int getBlockCount(String params) {
+	
+	public String can_connect(){
+		String returnValue = "";
+		String method = "getmininginfo";
+		String response = call(method, null);
+		JSONObject obj = new JSONObject(response);
+		try {
+			if (obj.get("error").toString().equals("null")){
+				returnValue = "true";
+			} else{
+				JSONObject errorObj = new JSONObject(obj.get("error").toString());
+				returnValue = errorObj.getString("message");
+			}
+		} catch(NullPointerException | NumberFormatException e) {
+			e.printStackTrace();
+		} 
+		return returnValue;
+	}
+	
+	public double getDifficulty(){
+		String method = "getdifficulty"; 
+		String response = call(method, null);
+		double result = 0;
+		JSONObject obj = new JSONObject(response);
+		try {
+			if (obj.get("error").toString().equals("null"))
+				result = obj.getDouble("result");
+			
+		} catch(NullPointerException | NumberFormatException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	public int getBlockCount(){
 		String method = "getblockcount";
-		String response = call(method, params);
+		String response = call(method, null);
 		int result = 0;
 		JSONObject obj = new JSONObject(response);
 		try {
@@ -111,10 +142,24 @@ public class TosCoindApi extends TosCoind {
 		}
 		return result;
 	}
-	public Double getDifficulty(String params) {
-		String method = "getdifficulty";
-		String response = call(method, params);
-		Double result = 0.0;
+	public String getBlockhash(int iBlock){
+		String method = "getblockhash";
+		String param = "["+iBlock+"]";
+		String response = call(method, param);
+		String result = null;
+		JSONObject obj = new JSONObject(response);
+		try {
+			if (obj.get("error").toString().equals("null"))
+				result = obj.getString("result");
+		} catch(NullPointerException | NumberFormatException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	public double getNetworkHashps() {
+		String method = "getnetworkhashps"; 
+		String response = call(method, null);
+		double result = 0;
 		JSONObject obj = new JSONObject(response);
 		try {
 			if (obj.get("error").toString().equals("null"))

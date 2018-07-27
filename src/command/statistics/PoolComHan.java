@@ -34,20 +34,20 @@ public class PoolComHan implements ComHanInterFace{
 		try {
 			conn = JDBCConnection.getConnection();
 			
-			int dDifficulty = 0;
-			int dNetworkHashrate = 0;
+			double dDifficulty = 0;
 			int iBlock = 0;
 			
 			String sBlockHash = null;
-			// bitcoin.can_connect() === true 보류
-			if(false){
+			if(TosCoindApi.getInstance().can_connect().equals("true")){
+				dDifficulty = TosCoindApi.getInstance().getDifficulty();
+				iBlock = TosCoindApi.getInstance().getBlockCount(); 
+				sBlockHash = iBlock > 0 ? TosCoindApi.getInstance().getBlockhash(iBlock) : null;
 				
 			}else{
 				dDifficulty = 1;
-				dNetworkHashrate = 1;
 				iBlock = 0;
 				
-				popup = Popup.getPopup("Unable to connect to wallet RPC service: "  + " Exception Message",  "alert alert-danger", null, null);
+				popup = Popup.getPopup("Unable to connect to wallet RPC service: "  + TosCoindApi.getInstance().can_connect(),  "alert alert-danger", null, null);
 				popups.add(popup);
 			}
 			

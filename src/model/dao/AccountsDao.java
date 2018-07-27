@@ -34,6 +34,12 @@ public class AccountsDao extends Base {
 		return resultValue;
 	}
 
+	public String getEmail(Connection conn, String email) throws SQLException {
+		String resultValue = "";
+		resultValue = getSingle(conn, email, "email", "email", 1, 1, false);
+		return resultValue;
+	}
+	
 	private int getUserId(Connection conn, String username) throws SQLException {
 		String resultValue = "";
 		int returnValue = 0;
@@ -612,4 +618,6 @@ public class AccountsDao extends Base {
 		}
 		return false;
 	}
+
+	
 }

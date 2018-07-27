@@ -1,6 +1,7 @@
 package command.dashBoard;
 
 import java.sql.*;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.naming.*;
@@ -80,8 +81,11 @@ public class DashBoardComHan implements ComHanInterFace {
 					aUserMiningStats = StatisticsDao.getInstance().getUserMiningStats(conn, account.getUsername(),
 							account.getId(), -1);
 					workers = Pool_workerDao.getInstance().getCountAllActiveWorkers(conn, -1);
-					blockCount = TosCoindApi.getInstance().getBlockCount(null);
-					difficulty = TosCoindApi.getInstance().getDifficulty(null);
+					blockCount = TosCoindApi.getInstance().getBlockCount();
+					difficulty = TosCoindApi.getInstance().getDifficulty();
+					dExpectedTimePerBlock = StatisticsDao.getInstance().getExpectedTimePerBlock(conn, "pool", iCurrentPoolHashrate);
+					dEstNextDifficulty = StatisticsDao.getInstance().getExpectedNextDifficulty();
+					iBlocksUntilDiffChange = StatisticsDao.getInstance().getBlocksUntilDiffChange();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -97,6 +101,13 @@ public class DashBoardComHan implements ComHanInterFace {
 				request.getSession().getServletContext().setAttribute("workers", workers);
 				request.setAttribute("workers", workers);
 				request.getSession().setAttribute("nethashrate", dNetworkHashrate);
+				Map<String, Object> NETWORK = new HashMap<>();
+				NETWORK.put("difficulty", difficulty);
+				NETWORK.put("block", blockCount);
+				NETWORK.put("EstNextDifficulty", dEstNextDifficulty);
+				NETWORK.put("EstTimePerBlock", dExpectedTimePerBlock);
+				NETWORK.put("BlocksUntilDiffChange", iBlocksUntilDiffChange);
+				request.setAttribute("NETWORK", NETWORK);
 				System.out.println(request.getAttribute("user_hashrate"));
 			} catch (NamingException | SQLException e) {
 				e.printStackTrace();

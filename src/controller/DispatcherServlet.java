@@ -53,7 +53,7 @@ public class DispatcherServlet extends HttpServlet {
 			globalSettings.put(key, value);
 		}
 		globalSettings.replace("mail.contextpath", getServletContext().getRealPath("/WEB-INF/view/mail"));
-		
+
 	}
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -96,10 +96,9 @@ public class DispatcherServlet extends HttpServlet {
 
 	private String getSide(String command) {
 		String activeSide = null;
-
-		if (command.equals("/EditAccount.do") || command.equals("/MyWorkers.do") || command.equals("/Transactions.do")
+		if (command.equals("/EditAccount.do") || command.equals("/Myworkers.do") || command.equals("/Transactions.do")
 				|| command.equals("/Earnings.do") || command.equals("/Notifications.do")
-				|| command.equals("/Invitaions.do") || command.equals("/QRcodes.do")) {
+				|| command.equals("/Invitations.do") || command.equals("/QRcodes.do")) {
 			activeSide = "Account";
 		} else if (command.equals("")) {
 

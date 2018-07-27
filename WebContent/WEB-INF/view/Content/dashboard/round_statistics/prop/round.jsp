@@ -7,7 +7,7 @@
               </div>
               <div class="circle-tile-content lightblue">
                 <div class="circle-tile-description text-faded">
-                  <p class="h5" id="b-nblock">{$NETWORK.block}</p>
+                  <p class="h5" id="b-nblock">${NETWORK.block }</p>
                 </div>
                 <div class="circle-tile-number text-faded">
                   <p class="h6">Current Block</p>
